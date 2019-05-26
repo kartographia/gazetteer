@@ -24,7 +24,7 @@ public class Edit extends javaxt.sql.Model {
   //** Constructor
   //**************************************************************************
     public Edit(){
-        super("edit", new java.util.HashMap<String, String>() {{
+        super("gazetter.edit", new java.util.HashMap<String, String>() {{
             
             put("summary", "summary");
             put("details", "details");
@@ -144,7 +144,6 @@ public class Edit extends javaxt.sql.Model {
     
 
 
-
   //**************************************************************************
   //** get
   //**************************************************************************
@@ -153,8 +152,7 @@ public class Edit extends javaxt.sql.Model {
    */
     public static Edit get(Object...args) throws SQLException {
         Object obj = _get(Edit.class, args);
-        if (obj==null) return null;
-        return (Edit) obj;
+        return obj==null ? null : (Edit) obj;
     }
 
 
@@ -164,8 +162,11 @@ public class Edit extends javaxt.sql.Model {
   /** Used to find Edits using a given set of constraints.
    */
     public static Edit[] find(Object...args) throws SQLException {
-        Object[] arr = _find(Edit.class, args);
-        if (arr==null) return null;
-        return (Edit[]) arr;
+        Object[] obj = _find(Edit.class, args);
+        Edit[] arr = new Edit[obj.length];
+        for (int i=0; i<arr.length; i++){
+            arr[i] = (Edit) obj[i];
+        }
+        return arr;
     }
 }

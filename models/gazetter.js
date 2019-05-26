@@ -1,4 +1,5 @@
 var package = "com.kartographia.gazetter";
+var schema = "gazetter";
 var models = {
 
 

@@ -57,7 +57,7 @@ public class NGA {
         java.sql.PreparedStatement placeQuery;
         javaxt.sql.Connection conn = database.getConnection();
         placeQuery = conn.getConnection().prepareStatement(
-            "select id, source_date from place where source_id=? and source_key=? and country_code=?"
+            "select id, source_date from gazetter.place where source_id=? and source_key=? and country_code=?"
         );
 
 

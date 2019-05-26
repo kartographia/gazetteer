@@ -1,18 +1,33 @@
 package com.kartographia.gazetter;
 import com.kartographia.gazetter.source.*;
+import javaxt.json.JSONObject;
 import javaxt.utils.Console;
 import javaxt.io.Jar;
-import javaxt.json.JSONObject;
 import javaxt.sql.*;
 
+
+//******************************************************************************
+//**  Main
+//******************************************************************************
+/**
+ *   Command line interface used to start the web server or to run specialized
+ *   functions (e.g. ingest, maintenance scripts, tests, etc).
+ *
+ ******************************************************************************/
 
 public class Main {
 
     public static final String UTF8_BOM = "\uFEFF";
 
+
+  //**************************************************************************
+  //** Main
+  //**************************************************************************
+  /** Entry point for the application.
+   */
     public static void main(String[] arr) throws Exception {
         java.util.HashMap<String, String> args = Console.parseArgs(arr);
-        boolean killLogger = true;
+
 
       //Get jar file
         Jar jar = new Jar(Main.class);
@@ -32,22 +47,9 @@ public class Main {
 
       //Initialize config
         JSONObject config = new JSONObject(configFile.getText());
-        Config.init(config);
-
-
-      //Initialize database
+        Config.init(config, jar);
         Database database = Config.getDatabase();
-        database.initConnectionPool();
 
-
-
-      //Initialize models
-        Model.init(jar, database.getConnectionPool());
-
-
-
-      //Initialize database schema
-        initSchema(database);
 
 
 
@@ -125,49 +127,6 @@ public class Main {
         }
         else{
             //start server
-        }
-    }
-
-
-    private static void initSchema(Database database) {
-        Connection conn = null;
-        try{
-            conn = database.getConnection();
-            /*
-            for (Table table : Database.getTables(conn)){
-                if (table.getName().equalsIgnoreCase("source")){
-                    conn.close();
-                    return;
-                }
-            }
-
-
-          //Initialize schema
-            Config.initSchema(conn);
-            */
-
-
-
-          //Insert sources
-            Recordset rs = new Recordset();
-            rs.open("select count(id) from source", conn);
-            int sources = rs.EOF ? 0 : rs.getValue(0).toInteger();
-            rs.close();
-
-            if (sources==0){
-                for (String name : new String[]{"NGA", "USGS"}){
-                    Source source = new Source();
-                    source.setName(name);
-                    source.save();
-                }
-            }
-
-
-
-        }
-        catch(Exception e){
-            if (conn!=null) conn.close();
-            e.printStackTrace();
         }
     }
 

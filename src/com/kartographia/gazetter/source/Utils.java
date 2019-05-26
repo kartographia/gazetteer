@@ -38,7 +38,7 @@ public class Utils {
     public static LinkedHashMap<String, Integer> getRecentUpdates(Source source, Database database) throws SQLException{
 
         String sql =
-        "select country_code, max(source_date) from place" +
+        "select country_code, max(source_date) from gazetter.place" +
         " where source_id=" + source.getID() +
         " group by country_code order by country_code";
 

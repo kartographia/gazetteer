@@ -26,7 +26,7 @@ public class PlaceName extends javaxt.sql.Model {
   //** Constructor
   //**************************************************************************
     public PlaceName(){
-        super("place_name", new java.util.HashMap<String, String>() {{
+        super("gazetter.place_name", new java.util.HashMap<String, String>() {{
             
             put("name", "name");
             put("uname", "uname");
@@ -170,7 +170,6 @@ public class PlaceName extends javaxt.sql.Model {
     
 
 
-
   //**************************************************************************
   //** get
   //**************************************************************************
@@ -179,8 +178,7 @@ public class PlaceName extends javaxt.sql.Model {
    */
     public static PlaceName get(Object...args) throws SQLException {
         Object obj = _get(PlaceName.class, args);
-        if (obj==null) return null;
-        return (PlaceName) obj;
+        return obj==null ? null : (PlaceName) obj;
     }
 
 
@@ -190,8 +188,11 @@ public class PlaceName extends javaxt.sql.Model {
   /** Used to find PlaceNames using a given set of constraints.
    */
     public static PlaceName[] find(Object...args) throws SQLException {
-        Object[] arr = _find(PlaceName.class, args);
-        if (arr==null) return null;
-        return (PlaceName[]) arr;
+        Object[] obj = _find(PlaceName.class, args);
+        PlaceName[] arr = new PlaceName[obj.length];
+        for (int i=0; i<arr.length; i++){
+            arr[i] = (PlaceName) obj[i];
+        }
+        return arr;
     }
 }

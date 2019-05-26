@@ -22,7 +22,7 @@ public class ChangeRequest extends javaxt.sql.Model {
   //** Constructor
   //**************************************************************************
     public ChangeRequest(){
-        super("change_request", new java.util.HashMap<String, String>() {{
+        super("gazetter.change_request", new java.util.HashMap<String, String>() {{
             
             put("placeID", "place_id");
             put("info", "info");
@@ -116,7 +116,6 @@ public class ChangeRequest extends javaxt.sql.Model {
     
 
 
-
   //**************************************************************************
   //** get
   //**************************************************************************
@@ -125,8 +124,7 @@ public class ChangeRequest extends javaxt.sql.Model {
    */
     public static ChangeRequest get(Object...args) throws SQLException {
         Object obj = _get(ChangeRequest.class, args);
-        if (obj==null) return null;
-        return (ChangeRequest) obj;
+        return obj==null ? null : (ChangeRequest) obj;
     }
 
 
@@ -136,8 +134,11 @@ public class ChangeRequest extends javaxt.sql.Model {
   /** Used to find ChangeRequests using a given set of constraints.
    */
     public static ChangeRequest[] find(Object...args) throws SQLException {
-        Object[] arr = _find(ChangeRequest.class, args);
-        if (arr==null) return null;
-        return (ChangeRequest[]) arr;
+        Object[] obj = _find(ChangeRequest.class, args);
+        ChangeRequest[] arr = new ChangeRequest[obj.length];
+        for (int i=0; i<arr.length; i++){
+            arr[i] = (ChangeRequest) obj[i];
+        }
+        return arr;
     }
 }

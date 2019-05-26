@@ -5,9 +5,6 @@ import com.vividsolutions.jts.geom.*;
 import javaxt.json.*;
 import javaxt.sql.*;
 import java.util.*;
-import java.sql.SQLException;
-import java.util.zip.ZipEntry;
-import java.util.zip.ZipInputStream;
 import java.math.BigDecimal;
 
 //******************************************************************************
@@ -57,7 +54,7 @@ public class USGS {
         java.sql.PreparedStatement placeQuery;
         javaxt.sql.Connection conn = database.getConnection();
         placeQuery = conn.getConnection().prepareStatement(
-            "select id, source_date from place where source_id=? and source_key=? and country_code=?"
+            "select id, source_date from gazetter.place where source_id=? and source_key=? and country_code=?"
         );
 
 

@@ -22,7 +22,7 @@ public class Source extends javaxt.sql.Model {
   //** Constructor
   //**************************************************************************
     public Source(){
-        super("source", new java.util.HashMap<String, String>() {{
+        super("gazetter.source", new java.util.HashMap<String, String>() {{
             
             put("name", "name");
             put("description", "description");
@@ -120,7 +120,6 @@ public class Source extends javaxt.sql.Model {
     
 
 
-
   //**************************************************************************
   //** get
   //**************************************************************************
@@ -129,8 +128,7 @@ public class Source extends javaxt.sql.Model {
    */
     public static Source get(Object...args) throws SQLException {
         Object obj = _get(Source.class, args);
-        if (obj==null) return null;
-        return (Source) obj;
+        return obj==null ? null : (Source) obj;
     }
 
 
@@ -140,8 +138,11 @@ public class Source extends javaxt.sql.Model {
   /** Used to find Sources using a given set of constraints.
    */
     public static Source[] find(Object...args) throws SQLException {
-        Object[] arr = _find(Source.class, args);
-        if (arr==null) return null;
-        return (Source[]) arr;
+        Object[] obj = _find(Source.class, args);
+        Source[] arr = new Source[obj.length];
+        for (int i=0; i<arr.length; i++){
+            arr[i] = (Source) obj[i];
+        }
+        return arr;
     }
 }

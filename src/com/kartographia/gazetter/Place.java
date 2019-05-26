@@ -33,7 +33,7 @@ public class Place extends javaxt.sql.Model {
   //** Constructor
   //**************************************************************************
     public Place(){
-        super("place", new java.util.HashMap<String, String>() {{
+        super("gazetter.place", new java.util.HashMap<String, String>() {{
             
             put("countryCode", "country_code");
             put("admin1", "admin1");
@@ -235,7 +235,6 @@ public class Place extends javaxt.sql.Model {
     
 
 
-
   //**************************************************************************
   //** get
   //**************************************************************************
@@ -244,8 +243,7 @@ public class Place extends javaxt.sql.Model {
    */
     public static Place get(Object...args) throws SQLException {
         Object obj = _get(Place.class, args);
-        if (obj==null) return null;
-        return (Place) obj;
+        return obj==null ? null : (Place) obj;
     }
 
 
@@ -255,8 +253,11 @@ public class Place extends javaxt.sql.Model {
   /** Used to find Places using a given set of constraints.
    */
     public static Place[] find(Object...args) throws SQLException {
-        Object[] arr = _find(Place.class, args);
-        if (arr==null) return null;
-        return (Place[]) arr;
+        Object[] obj = _find(Place.class, args);
+        Place[] arr = new Place[obj.length];
+        for (int i=0; i<arr.length; i++){
+            arr[i] = (Place) obj[i];
+        }
+        return arr;
     }
 }
