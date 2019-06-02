@@ -71,12 +71,14 @@ public class Utils {
         private long x = 0;
         private long startTime;
 
+      //Instantiate the counter with a known record count
         public Counter(long ttl){
             this.ttl = ttl;
-            startTime = System.currentTimeMillis();
+            init();
         }
 
 
+      //Instantiate the counter using a tsv/csv file
         public Counter(javaxt.io.File file, boolean skipHeader) throws Exception {
             ttl = 0L;
             System.out.print("Analyzing File...");
@@ -90,12 +92,16 @@ public class Utils {
             String elapsedTime = getElapsedTime(t);
             System.out.println(" Done!");
             System.out.println("Found " + getNumber(ttl) + " records in " + elapsedTime);
+            init();
+        }
+
+
+        private void init(){
             javaxt.utils.Date startDate = new javaxt.utils.Date();
             startDate.setTimeZone("America/New York");
             System.out.println("Starting ingest at " + startDate.toString("yyyy-MM-dd HH:mm a"));
             startTime = System.currentTimeMillis();
         }
-
 
         public void updateCount(){
             if (x==0) System.out.print(statusText);

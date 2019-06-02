@@ -1,5 +1,6 @@
 package com.kartographia.gazetter;
 import com.kartographia.gazetter.source.*;
+import com.kartographia.gazetter.web.WebApp;
 import javaxt.json.JSONObject;
 import javaxt.utils.Console;
 import javaxt.io.Jar;
@@ -59,50 +60,57 @@ public class Main {
 
             javaxt.io.File file = new javaxt.io.File(args.get("-import"));
             if (file.exists()){
-                java.io.BufferedReader br = null;
 
-                long startTime = System.currentTimeMillis();
-
-                try{
-
-                    br = file.getBufferedReader("UTF-8");
-                    String header = br.readLine();
-                    if (header.startsWith(UTF8_BOM)) {
-                        header = header.substring(1);
-                    }
-                    br.close();
-
-
-                    if (header.startsWith("FEATURE_ID|")){
-                        USGS.load(file, database);
-                    }
-                    else if (header.startsWith("RC\t")){
-                        NGA.load(file, database);
-                    }
-                    else if (header.startsWith("USPS\t")){
-                        USCensus.load(file, database);
-                    }
-                    else{
-                        throw new Exception("Unknown file type");
-                    }
-
-
+                if (file.getExtension().equals("shp")){
+                    System.out.println(
+                    "ERROR: Please specify a name of a source (e.g. \"VLIZ\") " +
+                    "using the -import argument and use -path to specify a path " +
+                    "to the shapefile");
                 }
-                catch(Exception e){
-                    try{ br.close(); } catch(Exception ex){}
-                    e.printStackTrace();
-                }
-                System.out.println();
+                else{
+                    java.io.BufferedReader br = null;
+                    try{
+                        long startTime = System.currentTimeMillis();
 
-                System.out.println("Ellapsed Time: " + Utils.getElapsedTime(startTime));
+                        br = file.getBufferedReader("UTF-8");
+                        String header = br.readLine();
+                        if (header.startsWith(UTF8_BOM)) {
+                            header = header.substring(1);
+                        }
+                        br.close();
+
+
+                        if (header.startsWith("FEATURE_ID|")){
+                            USGS.load(file, database);
+                        }
+                        else if (header.startsWith("RC\t")){
+                            NGA.load(file, database);
+                        }
+                        else if (header.startsWith("USPS\t")){
+                            USCensus.load(file, database);
+                        }
+                        else{
+                            throw new Exception("Unknown file type");
+                        }
+
+                        System.out.println();
+                        System.out.println("Ellapsed Time: " + Utils.getElapsedTime(startTime));
+                    }
+                    catch(Exception e){
+                        try{ br.close(); } catch(Exception ex){}
+                        e.printStackTrace();
+                    }
+                }
             }
             else{
+
+                String source = args.get("-import");
+                if (source==null) throw new Exception("Source is required");
 
                 String path = args.get("-path");
                 file = new javaxt.io.File(path);
                 if (file.exists()){
-                    String source = args.get("-import");
-                    if (source==null) throw new Exception("Source is required");
+
                     if (source.equalsIgnoreCase("NGA")){
                         NGA.load(file, database);
                     }
@@ -112,6 +120,13 @@ public class Main {
                     else if (source.equalsIgnoreCase("Census")){
                         USCensus.load(file, database);
                     }
+                    else if (source.equalsIgnoreCase("VMAP")){
+                        VMAP.load(file, database);
+                    }
+                    else if (source.equalsIgnoreCase("VLIZ")){
+                        VLIZ.load(file, database);
+                    }
+
                 }
                 else{
                     throw new Exception("Path is required");
@@ -126,7 +141,23 @@ public class Main {
 
         }
         else{
-            //start server
+            try{
+                if (!config.has("webserver")){
+                    throw new Exception("Config file is missing \"webserver\" config information");
+                }
+                else{
+                    JSONObject webConfig = config.get("webserver").toJSONObject();
+                    updateDir("webDir", webConfig, configFile);
+                    updateDir("logDir", webConfig, configFile);
+                    updateFile("keystore", webConfig, configFile);
+
+                    new WebApp(config.get("webserver").toJSONObject(), database);
+                    //SyncService.start();
+                }
+            }
+            catch(Exception e){
+                System.out.println(e.getMessage());
+            }
         }
     }
 
@@ -144,6 +175,73 @@ public class Main {
             file = new javaxt.io.File(jarFile.MapPath(path));
         }
         return file;
+    }
+
+
+  //**************************************************************************
+  //** updateDir
+  //**************************************************************************
+  /** Used to update a path to a directory defined in a config file. Resolves
+   *  both canonical and relative paths (relative to the configFile).
+   */
+    private static void updateDir(String key, JSONObject config, javaxt.io.File configFile){
+        if (config.has(key)){
+            String path = config.get(key).toString();
+            if (path==null){
+                config.remove(key);
+            }
+            else{
+                path = path.trim();
+                if (path.length()==0){
+                    config.remove(key);
+                }
+                else{
+
+                    javaxt.io.Directory dir = new javaxt.io.Directory(path);
+                    if (!dir.exists()) dir = new javaxt.io.Directory(configFile.MapPath(path));
+
+                    if (dir.exists()){
+                        config.set(key, dir.toString());
+                    }
+                    else{
+                        config.remove(key);
+                    }
+                }
+            }
+        }
+    }
+
+  //**************************************************************************
+  //** updateFile
+  //**************************************************************************
+  /** Used to update a path to a file defined in a config file. Resolves
+   *  both canonical and relative paths (relative to the configFile).
+   */
+    private static void updateFile(String key, JSONObject config, javaxt.io.File configFile){
+        if (config.has(key)){
+            String path = config.get(key).toString();
+            if (path==null){
+                config.remove(key);
+            }
+            else{
+                path = path.trim();
+                if (path.length()==0){
+                    config.remove(key);
+                }
+                else{
+
+                    javaxt.io.File file = new javaxt.io.File(path);
+                    if (!file.exists()) file = new javaxt.io.File(configFile.MapPath(path));
+
+                    if (file.exists()){
+                        config.set(key, file.toString());
+                    }
+                    else{
+                        config.remove(key);
+                    }
+                }
+            }
+        }
     }
 
 }

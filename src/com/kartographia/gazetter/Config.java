@@ -32,7 +32,6 @@ public class Config extends javaxt.express.Config {
       //Initialize database
         JSONObject gazetteer = get("schema").get("gazetter").toJSONObject();
         javaxt.io.File sql = getFile(gazetteer.get("path").toString(), jar.getFile());
-        System.out.println(sql);
         if (!sql.exists()) throw new Exception("Schema not found");
         String tableSpace = gazetteer.get("tablespace").toString();
         DbUtils.initSchema(database, sql.getText(), tableSpace);
@@ -44,26 +43,13 @@ public class Config extends javaxt.express.Config {
 
 
       //Insert sources as needed
-        Connection conn = null;
-        try{
-            conn = database.getConnection();
-
-            Recordset rs = new Recordset();
-            rs.open("select count(id) from gazetter.source", conn);
-            int sources = rs.EOF ? 0 : rs.getValue(0).toInteger();
-            rs.close();
-
-            if (sources==0){
-                for (String name : new String[]{"NGA", "USGS"}){
-                    Source source = new Source();
-                    source.setName(name);
-                    source.save();
-                }
+        for (String name : new String[]{"NGA", "USGS", "VLIZ"}){
+            Source source = Source.get("name=",name);
+            if (source==null){
+                source = new Source();
+                source.setName(name);
+                source.save();
             }
-        }
-        catch(Exception e){
-            if (conn!=null) conn.close();
-            throw e;
         }
     }
 

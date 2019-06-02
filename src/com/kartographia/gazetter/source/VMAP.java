@@ -1,10 +1,98 @@
 package com.kartographia.gazetter.source;
+import com.kartographia.gazetter.*;
+import com.vividsolutions.jts.geom.*;
+import javaxt.json.JSONObject;
+import javaxt.sql.Database;
+import java.util.*;
+import openmap.*;
 
+//******************************************************************************
+//**  VMAP Data Loader
+//******************************************************************************
+/**
+ *  Used to parse and load VMAP data from NGA
+ *
+ ******************************************************************************/
 
 public class VMAP {
 
-    public VMAP(javaxt.sql.Connection conn) throws java.sql.SQLException{
-        intesectPolygons(conn);
+
+  //**************************************************************************
+  //** load
+  //**************************************************************************
+  /** Used load a shapefile containing political boundaries. Each record in
+   *  the shapefile should contain the FIPS country code and a polygon/multi-
+   *  polygon representing the physical borders of the country. The shapefile
+   *  was generated using NGA's World Vector Shoreline Plus (WVSPLUS).
+   *  @param file polboundaries_250K.shp
+   */
+    public static void load(javaxt.io.File file, Database database) throws Exception {
+        Source source = Source.get("name=","NGA");
+
+
+        ShapeFile shp = new ShapeFile(file.toFile());
+        System.out.println("Found " + shp.getRecordCount() + " records in the shapefile");
+        Utils.Counter counter = new Utils.Counter(shp.getRecordCount());
+
+        boolean isValidated = false;
+
+        Iterator<Record> it = shp.getRecords();
+        while (it.hasNext()){
+            Record record = it.next();
+            counter.updateCount();
+
+            if (!isValidated){
+                HashSet<String> colNames = new HashSet<>();
+                for (Field field : record.getFields()){
+                    String fieldName = field.getName().toLowerCase();
+                    if (fieldName.endsWith("*")) fieldName = fieldName.substring(0, fieldName.length()-1);
+                    colNames.add(fieldName);
+                }
+                if (!colNames.contains("name") || !colNames.contains("cc") || !colNames.contains("geom") ){
+                    throw new Exception();
+                }
+                isValidated = true;
+            }
+
+
+            String name = record.getValue("name").toString();
+            String cc = record.getValue("cc").toString();
+            Geometry geom = record.getValue("geom").toGeometry();
+
+
+          //Save country
+            Place place = new Place();
+            place.setCountryCode(cc);
+            place.setGeom(geom);
+            place.setSource(source);
+            place.setType("boundary");
+            place.setSubtype("country");
+
+            JSONObject json = new JSONObject();
+            json.set("source", file.getName());
+            place.setInfo(json);
+
+            try{
+                place.save();
+            }
+            catch(Exception e){
+                //probably a duplicate
+            }
+
+
+            PlaceName placeName = new PlaceName();
+            placeName.setName(name);
+            placeName.setLanguageCode("eng");
+            placeName.setType(2); //2=formal
+            placeName.setPlace(place);
+            try{
+                placeName.save();
+            }
+            catch(Exception e){
+                //probably a duplicate
+            }
+
+        }
 
     }
 
@@ -19,14 +107,14 @@ public class VMAP {
             String name = rs.getValue("nam").toString();
             System.out.println("\r\n" + id + ":\t" + name);
 
-            
+
             if (name!=null && !name.equals("UNK")){
                 //updateCommonName(id, name, conn);
             }
 
             updateRank(id, conn);
 
-            
+
             rs.moveNext();
         }
         rs.close();
@@ -71,7 +159,7 @@ public class VMAP {
 
 
             if (!cc.equals("US")){
-            
+
               //If the polygon includes multiple cities,
                 boolean pplx = rank>maxRank;
 
@@ -95,7 +183,7 @@ public class VMAP {
                 //rs.update();
 
 
-                
+
 
             }
             rs.moveNext();
