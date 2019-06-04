@@ -35,41 +35,49 @@ var models = {
             {name: 'geom',          type: 'geo'},
             {name: 'type',          type: 'string'}, //residential, cultural, administrative, industrial, military, etc
             {name: 'subtype',       type: 'string'}, //city, town, village, building, park, monument, etc
-            {name: 'rank',          type: 'int'}, //1-5 for populated places
+            {name: 'rank',          type: 'int'},    //1-5 for populated places
             {name: 'source',        type: 'Source'},
             {name: 'sourceKey',     type: 'long'},
             {name: 'sourceDate',    type: 'int'}, //YYYYMMDD in utc
             {name: 'info',          type: 'json'},
             {name: 'lastModified',  type: 'date'}
         ],
+        hasMany: [
+            {model: 'Name',     name: 'names'}
+        ],
         constraints: [
             {name: 'countryCode',   required: true,  length: 2},
             {name: 'admin1',        length: 2},
-            {name: 'geom',          required: true}
+            {name: 'geom',          required: true},
+            {name: 'source',        required: true}
         ]
     },
 
 
-
-
   //**************************************************************************
-  //** PlaceName
+  //** Name
   //**************************************************************************
   /** Used to represent a name of a place
    */
-    PlaceName: {
+    Name: {
         fields: [
             {name: 'name',          type: 'string'},
             {name: 'uname',         type: 'string'}, //uppercase varient
-            {name: 'languageCode',  type: 'char'},
+            {name: 'languageCode',  type: 'char'}, //eng (English)
             {name: 'type',          type: 'int'}, //1 (Common name), 2 (Formal name), 3 (Varient)
-            {name: 'place',         type: 'Place'},
+
+            {name: 'source',        type: 'Source'},
+            {name: 'sourceKey',     type: 'long'},
+            {name: 'sourceDate',    type: 'int'}, //YYYYMMDD in utc
+
             {name: 'info',          type: 'json'},
             {name: 'lastModified',  type: 'date'}
         ],
         constraints: [
             {name: 'name',          required: true},
-            {name: 'languageCode',  length: 3}
+            {name: 'languageCode',  required: true, length: 3},
+            {name: 'type',          required: true},
+            {name: 'source',        required: true}
         ]
     },
 
@@ -102,13 +110,15 @@ var models = {
    */
     ChangeRequest: {
         fields: [
-            {name: 'placeID',       type: 'long'},
+            {name: 'place',         type: 'Place'},
             {name: 'info',          type: 'json'},
+            {name: 'status',        type: 'string'}, //PENDING, REJECTED, ACCEPTED
             {name: 'lastModified',  type: 'date'}
         ],
         constraints: [
-            {name: 'placeID',       required: true},
-            {name: 'info',          required: true}
+            {name: 'place',         required: true},
+            {name: 'info',          required: true},
+            {name: 'status',        required: true, length: 10}
         ]
     }
 };

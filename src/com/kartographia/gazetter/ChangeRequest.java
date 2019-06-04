@@ -13,8 +13,9 @@ import javaxt.utils.Date;
 
 public class ChangeRequest extends javaxt.sql.Model {
 
-    private Long placeID;
+    private Place place;
     private JSONObject info;
+    private String status;
     private Date lastModified;
 
 
@@ -24,8 +25,9 @@ public class ChangeRequest extends javaxt.sql.Model {
     public ChangeRequest(){
         super("gazetter.change_request", new java.util.HashMap<String, String>() {{
             
-            put("placeID", "place_id");
+            put("place", "place_id");
             put("info", "info");
+            put("status", "status");
             put("lastModified", "last_modified");
 
         }});
@@ -65,10 +67,15 @@ public class ChangeRequest extends javaxt.sql.Model {
 
         try{
             this.id = getValue(rs, "id").toLong();
-            this.placeID = getValue(rs, "place_id").toLong();
+            Long placeID = getValue(rs, "place_id").toLong();
             this.info = new JSONObject(getValue(rs, "info").toString());
+            this.status = getValue(rs, "status").toString();
             this.lastModified = getValue(rs, "last_modified").toDate();
 
+
+
+          //Set place
+            if (placeID!=null) place = new Place(placeID);
 
         }
         catch(Exception e){
@@ -87,18 +94,21 @@ public class ChangeRequest extends javaxt.sql.Model {
 
         Long id = json.get("id").toLong();
         if (id!=null && id>0) this.id = id;
-        this.placeID = json.get("placeID").toLong();
+        if (json.has("place")){
+            place = new Place(json.get("place").toJSONObject());
+        }
         this.info = json.get("info").toJSONObject();
+        this.status = json.get("status").toString();
         this.lastModified = json.get("lastModified").toDate();
     }
 
 
-    public Long getPlaceID(){
-        return placeID;
+    public Place getPlace(){
+        return place;
     }
 
-    public void setPlaceID(Long placeID){
-        this.placeID = placeID;
+    public void setPlace(Place place){
+        this.place = place;
     }
 
     public JSONObject getInfo(){
@@ -107,6 +117,14 @@ public class ChangeRequest extends javaxt.sql.Model {
 
     public void setInfo(JSONObject info){
         this.info = info;
+    }
+
+    public String getStatus(){
+        return status;
+    }
+
+    public void setStatus(String status){
+        this.status = status;
     }
 
     public Date getLastModified(){

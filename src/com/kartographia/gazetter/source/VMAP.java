@@ -72,26 +72,20 @@ public class VMAP {
             json.set("source", file.getName());
             place.setInfo(json);
 
+            Name placeName = new Name();
+            placeName.setName(name);
+            placeName.setLanguageCode("eng");
+            placeName.setType(2); //2=formal
+            placeName.setSource(source);
+            place.addName(placeName);
+
             try{
                 place.save();
             }
             catch(Exception e){
-                //probably a duplicate
+                System.out.println("Error saving \"" + name + "\" (" + cc + ")");
+                e.printStackTrace();
             }
-
-
-            PlaceName placeName = new PlaceName();
-            placeName.setName(name);
-            placeName.setLanguageCode("eng");
-            placeName.setType(2); //2=formal
-            placeName.setPlace(place);
-            try{
-                placeName.save();
-            }
-            catch(Exception e){
-                //probably a duplicate
-            }
-
         }
 
     }

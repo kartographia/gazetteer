@@ -201,6 +201,37 @@ public class NGA {
                 place.setInfo(json);
 
 
+
+              //Add place names
+                String name =    col[22]; //Full name
+                String altName = col[23]; //Same as the full name but the character/diacritic combinations and special characters are substituted
+                                          //with QWERTY (visible U.S. English keyboard) characters while still maintaining casing and spaces.
+                                          //This field also includes non-roman script based names which are stripped of vowel markings.
+
+
+                Name placeName = new Name();
+                placeName.setName(name);
+                placeName.setLanguageCode(languageCode);
+                placeName.setType(nameType);
+                placeName.setSource(source);
+                placeName.setSourceKey(id);
+                placeName.setSourceDate(lastUpdate);
+                place.addName(placeName);
+
+
+                if (!name.equals(altName)){
+                    placeName = new Name();
+                    placeName.setName(altName);
+                    placeName.setLanguageCode("eng");
+                    placeName.setType(nameType);
+                    placeName.setSource(source);
+                    placeName.setSourceKey(id);
+                    placeName.setSourceDate(lastUpdate);
+                    place.addName(placeName);
+                }
+
+
+
                 try{
                     place.save();
                 }
@@ -224,50 +255,12 @@ public class NGA {
 
                     if (lastUpdate>currDate){
                         ChangeRequest cr = new ChangeRequest();
-                        cr.setPlaceID(placeID);
+                        cr.setPlace(place);
                         cr.setInfo(place.toJson());
                         cr.save();
                     }
                 }
-
-
-
-              //Add place names
-                String name =    col[22]; //Full name
-                String altName = col[23]; //Same as the full name but the character/diacritic combinations and special characters are substituted
-                                          //with QWERTY (visible U.S. English keyboard) characters while still maintaining casing and spaces.
-                                          //This field also includes non-roman script based names which are stripped of vowel markings.
-
-
-                PlaceName placeName = new PlaceName();
-                placeName.setName(name);
-                placeName.setLanguageCode(languageCode);
-                placeName.setType(nameType);
-                placeName.setPlace(place);
-                try{
-                    placeName.save();
-                }
-                catch(Exception e){
-                    //probably a duplicate
-                }
-
-
-                if (!name.equals(altName)){
-                    placeName = new PlaceName();
-                    placeName.setName(altName);
-                    placeName.setLanguageCode("eng");
-                    placeName.setType(nameType);
-                    placeName.setPlace(place);
-                    try{
-                        placeName.save();
-                    }
-                    catch(Exception e){
-                        //probably a duplicate
-                    }
-                }
-
             }
-
         }
 
 

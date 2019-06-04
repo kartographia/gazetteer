@@ -63,7 +63,7 @@ public class VLIZ {
 
           //Save country
             Place place = new Place();
-            place.setCountryCode("OC"); //<-- Not an offical CC!
+            place.setCountryCode("OC"); //<-- Not an offical country code!
             place.setGeom(geom);
             place.setSource(source);
             place.setType("boundary");
@@ -73,26 +73,15 @@ public class VLIZ {
             json.set("source", file.getName());
             place.setInfo(json);
 
-            try{
-                place.save();
-            }
-            catch(Exception e){
-                //probably a duplicate
-            }
 
-
-            PlaceName placeName = new PlaceName();
+            Name placeName = new Name();
             placeName.setName(name);
             placeName.setLanguageCode("eng");
             placeName.setType(2); //2=formal
-            placeName.setPlace(place);
-            try{
-                placeName.save();
-            }
-            catch(Exception e){
+            placeName.setSource(source);
+            place.addName(placeName);
 
-            }
-
+            place.save();
         }
 
     }

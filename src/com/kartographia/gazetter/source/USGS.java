@@ -111,8 +111,21 @@ public class USGS {
             place.setSourceDate(lastUpdate);
             place.setInfo(info);
 
+
+          //Update
             updateUSTerritories(place);
             name = updateBuildings(name, place);
+
+
+          //Add name
+            Name placeName = new Name();
+            placeName.setName(name);
+            placeName.setLanguageCode("eng");
+            placeName.setType(2);
+            placeName.setSource(source);
+            placeName.setSourceKey(id);
+            placeName.setSourceDate(lastUpdate);
+            place.addName(placeName);
 
 
           //Save place
@@ -139,27 +152,10 @@ public class USGS {
 
                 if (lastUpdate>currDate){
                     ChangeRequest cr = new ChangeRequest();
-                    cr.setPlaceID(placeID);
+                    cr.setPlace(place);
                     cr.setInfo(place.toJson());
                     cr.save();
                 }
-            }
-
-
-          //Instantiate PlaceName
-            PlaceName placeName = new PlaceName();
-            placeName.setName(name);
-            placeName.setLanguageCode("eng");
-            placeName.setType(2);
-            placeName.setPlace(place);
-
-
-          //Save PlaceName
-            try{
-                placeName.save();
-            }
-            catch(Exception e){
-                //probably a duplicate
             }
         }
 

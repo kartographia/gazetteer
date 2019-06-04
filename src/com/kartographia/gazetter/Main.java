@@ -37,7 +37,7 @@ public class Main {
 
       //Get config file
         javaxt.io.File configFile = (args.containsKey("-config")) ?
-            getFile(args.get("-config"), jarFile) :
+            Config.getFile(args.get("-config"), jarFile) :
             new javaxt.io.File(jar.getFile().getParentFile(), "config.json");
 
         if (!configFile.exists()) {
@@ -46,8 +46,19 @@ public class Main {
         }
 
 
-      //Initialize config
+      //Read config file (json)
         JSONObject config = new JSONObject(configFile.getText());
+
+
+      //Update relative paths to schema
+        JSONObject schema = config.get("schema").toJSONObject();
+        JSONObject gazetteer = schema.get("gazetter").toJSONObject();
+        Config.updateFile("path", gazetteer, configFile);
+        Config.updateFile("updates", gazetteer, configFile);
+        schema.set("gazetter", gazetteer);
+
+
+      //Initialize config
         Config.init(config, jar);
         Database database = Config.getDatabase();
 
@@ -147,9 +158,9 @@ public class Main {
                 }
                 else{
                     JSONObject webConfig = config.get("webserver").toJSONObject();
-                    updateDir("webDir", webConfig, configFile);
-                    updateDir("logDir", webConfig, configFile);
-                    updateFile("keystore", webConfig, configFile);
+                    Config.updateDir("webDir", webConfig, configFile);
+                    Config.updateDir("logDir", webConfig, configFile);
+                    Config.updateFile("keystore", webConfig, configFile);
 
                     new WebApp(config.get("webserver").toJSONObject(), database);
                     //SyncService.start();
@@ -160,88 +171,4 @@ public class Main {
             }
         }
     }
-
-
-  //**************************************************************************
-  //** getFile
-  //**************************************************************************
-  /** Returns a File for a given path
-   *  @param path Full canonical path to a file or a relative path (relative
-   *  to the jarFile)
-   */
-    private static javaxt.io.File getFile(String path, javaxt.io.File jarFile){
-        javaxt.io.File file = new javaxt.io.File(path);
-        if (!file.exists()){
-            file = new javaxt.io.File(jarFile.MapPath(path));
-        }
-        return file;
-    }
-
-
-  //**************************************************************************
-  //** updateDir
-  //**************************************************************************
-  /** Used to update a path to a directory defined in a config file. Resolves
-   *  both canonical and relative paths (relative to the configFile).
-   */
-    private static void updateDir(String key, JSONObject config, javaxt.io.File configFile){
-        if (config.has(key)){
-            String path = config.get(key).toString();
-            if (path==null){
-                config.remove(key);
-            }
-            else{
-                path = path.trim();
-                if (path.length()==0){
-                    config.remove(key);
-                }
-                else{
-
-                    javaxt.io.Directory dir = new javaxt.io.Directory(path);
-                    if (!dir.exists()) dir = new javaxt.io.Directory(configFile.MapPath(path));
-
-                    if (dir.exists()){
-                        config.set(key, dir.toString());
-                    }
-                    else{
-                        config.remove(key);
-                    }
-                }
-            }
-        }
-    }
-
-  //**************************************************************************
-  //** updateFile
-  //**************************************************************************
-  /** Used to update a path to a file defined in a config file. Resolves
-   *  both canonical and relative paths (relative to the configFile).
-   */
-    private static void updateFile(String key, JSONObject config, javaxt.io.File configFile){
-        if (config.has(key)){
-            String path = config.get(key).toString();
-            if (path==null){
-                config.remove(key);
-            }
-            else{
-                path = path.trim();
-                if (path.length()==0){
-                    config.remove(key);
-                }
-                else{
-
-                    javaxt.io.File file = new javaxt.io.File(path);
-                    if (!file.exists()) file = new javaxt.io.File(configFile.MapPath(path));
-
-                    if (file.exists()){
-                        config.set(key, file.toString());
-                    }
-                    else{
-                        config.remove(key);
-                    }
-                }
-            }
-        }
-    }
-
 }
