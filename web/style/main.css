@@ -1,0 +1,472 @@
+
+@import url(https://fonts.googleapis.com/css?family=Roboto);
+
+body, textarea, input, select, td, th {
+    font-family: roboto,helvetica,arial,verdana,sans-serif;
+    font-size: 15px;
+}
+
+
+.header {
+    background: #0d4262;
+    height: 55px;
+    cursor: default;
+    border-bottom: 1px solid #3d5c6d;
+}
+
+
+
+.header-search-input {
+    border: 1px solid #0d4262;
+    margin-left: 52px;
+    width: 400px;
+    height: 30px;
+    background-color: rgba(255, 255, 255, 0.5);
+    padding: 2px 5px;
+    border-radius: 3px;
+    color: #fff;
+}
+
+.header-search-input::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+    opacity: 0.9;
+    color: #def3ff;
+    font-weight: 100;
+    font-style:italic;
+}
+.header-search-input::-moz-placeholder { /* Firefox 19+ */
+    opacity: 0.9;
+    color: #def3ff;
+    font-weight: 100;
+    font-style:italic;
+}
+.header-search-input:-ms-input-placeholder { /* IE 10+ */
+    opacity: 0.9;
+    color: #def3ff;
+    font-weight: 100;
+    font-style:italic;
+}
+.header-search-input:-moz-placeholder { /* Firefox 18- */
+    opacity: 0.9;
+    color: #def3ff;
+    font-weight: 100;
+    font-style:italic;
+}
+
+
+/**************************************************************************/
+/** Map Toolbar
+/**************************************************************************/
+/** The following classes are used to define the style for map toolbar
+ */
+
+.map-toolbar{
+    background-color: #373a41;
+    width: 52px;
+    height: 100%;
+}
+
+
+
+/**************************************************************************/
+/** Menu Panel
+/**************************************************************************/
+/** The following classes are used to define the style for the panel that
+ *  appears next to the map toolbar when the user click on a map tool.
+ */
+
+.menu-panel {
+    color: #fff;
+    background-color: rgba(55,58,68,0.8); /* same as map-toolbar (#373a41) with 0.8 opacity */
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -o-user-select: none;
+    -ms-user-select: none;
+    -khtml-user-select: none;
+    user-select: none;
+}
+
+.menu-panel-header {
+    height: 40px;
+    background-color: #282a2f;
+}
+
+.menu-panel-title {
+    white-space: nowrap;
+    text-transform: uppercase;
+    font-size: 14px;
+    line-height: 40px; /*Should match panel-header height*/
+
+    padding-left: 7px;
+    color: #8794a7;
+    font-weight: 600;
+    font-size: 15px;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 3px 10px 0 rgba(0, 0, 0, 0.19);
+}
+
+
+.menu-panel-close {
+    text-align: center;
+    position: absolute;
+    right: 0;
+    top: 0;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    font-weight: 600;
+    color: #8794a7;
+}
+
+.menu-panel-close:after {
+    content: "\2715"; /*unicode for &#x2715;*/
+}
+
+.menu-panel-close:hover::after {
+    color: #208ec9;
+}
+
+
+
+
+
+
+/**************************************************************************/
+/** Side Panel
+/**************************************************************************/
+/** The following classes are used to define the style for the panel that
+ *  appears to the right of the map.
+ */
+
+.side-panel {
+    width: 300px;
+    color: #516179;
+    border-left: 1px solid #8f8f8f;
+    background-color: #f7faff;
+
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -o-user-select: none;
+    -ms-user-select: none;
+    -khtml-user-select: none;
+    user-select: none;
+}
+
+.side-panel-header {
+    height: 40px;
+}
+
+.side-panel-title {
+    white-space: nowrap;
+    text-transform: uppercase;
+    font-size: 14px;
+    line-height: 40px; /*Should match panel-header height*/
+
+    padding-left: 7px;
+    color: #516179;
+    font-weight: 600;
+    font-size: 15px;
+}
+
+
+
+.side-panel-close {
+    text-align: center;
+    position: absolute;
+    right: 0;
+    top: 0;
+    cursor: pointer;
+    width: 40px;
+    height: 40px;
+    line-height: 40px;
+    font-weight: 600;
+    color: #516179;
+}
+
+.side-panel-close:after {
+    content: "\2715"; /*unicode for &#x2715;*/
+}
+
+.side-panel-close:hover::after {
+    color: #208ec9;
+}
+
+
+.side-panel-search-row {
+    height: 30px;
+    background: #d0dbe7;
+    line-height: 30px;
+    padding-left: 15px;
+}
+
+.side-panel-search-input {
+    border: none;
+    background: #d0dbe7;
+    height: 30px;
+    width: 100%;
+    color: #516179;
+}
+
+.side-panel-search-input::-webkit-input-placeholder { /* Chrome/Opera/Safari */
+    opacity: 0.6;
+    color: #516179;
+}
+.side-panel-search-input::-moz-placeholder { /* Firefox 19+ */
+    opacity: 0.6;
+    color: #516179;
+}
+.side-panel-search-input:-ms-input-placeholder { /* IE 10+ */
+    opacity: 0.6;
+    color: #516179;
+}
+.side-panel-search-input:-moz-placeholder { /* Firefox 18- */
+    opacity: 0.6;
+    color: #516179;
+}
+
+
+.side-panel-row {
+    height: 30px;
+    line-height: 30px;
+    color: #516179;
+    cursor: pointer;
+    padding-left: 15px;
+    white-space: nowrap;
+}
+
+/*.side-panel-row:hover,*/
+.side-panel-row.selected {
+    background-color: #639af5;
+    color: #fff;
+
+}
+
+/* Add right "arrow" icon */
+
+/*.side-panel-row:hover:after,*/
+.side-panel-row.selected:after {
+    content:"";
+    position:absolute;
+    border-right: 2px solid #fff;
+    border-bottom: 2px solid #fff;
+    width: 7px;
+    height: 7px;
+    transform: rotate(-45deg);
+    margin: 10px 12px 0px 0px;
+    cursor: pointer;
+    right: 0;
+}
+
+/**************************************************************************/
+/** Country Details
+/**************************************************************************/
+/** The following classes are used to define the style for the country
+ *  details panel
+ */
+
+.country-logo, .country-logo-shadow{
+    border-radius: 50%;
+    display: inline-block;
+    position: absolute;
+    cursor:pointer;
+    transition: 0.8s;
+}
+
+.country-logo:hover {
+    background-color: #1d8ecc;
+    background-color: #4bb5ef;
+
+}
+
+.country-logo {
+    height: 150px;
+    width: 150px;
+    border: 2px solid #fff;
+    z-index: 2;
+    color: #f4fbff;
+    text-shadow: 4px 4px 0px rgba(0,0,0,0.1);
+    font-size: 80px;
+    text-align: center;
+    background-color: #4bb5ef;
+    background-color: #1d8ecc;
+    position: relative;
+    line-height: 150px;
+}
+
+.country-logo-shadow {
+    margin: 0px 0px 0 0px;
+    border: 5px solid #1d8ecc;
+    opacity: 0.5;
+    width: 147px;
+    height: 146px;
+    z-index: 1;
+    left: -3px;
+    top: -3px;
+}
+
+
+.country-names {
+    margin: 10px;
+    line-height: 24px;
+}
+
+.country-name-header {
+    padding: 33px 0 3px 0;
+    font-weight: 600;
+    border-bottom: 1px solid #516179;
+    margin: 0 0 7px;
+}
+
+.country-name-list {
+    cursor:pointer;
+}
+
+.country-name-list:before {
+  content: "\2022";
+  font-weight: bold;
+  display: inline-block;
+  width: 1em;
+  margin-left: 5px;
+}
+
+.country-name-list:hover {
+    background-color: #639af5;
+    color: #fff;
+}
+
+.country-name-list.selected {
+    background-color: #639af5;
+    color: #fff;
+}
+
+/**************************************************************************/
+/** Facet Panel
+/**************************************************************************/
+/** The following classes are used to define the style for facets
+ */
+
+.facet-panel {
+    background: #ffffff;
+    border: 1px solid #adadad;
+    width: 175px;
+    margin: 10px 0 15px 11px;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 3px 10px 0 rgba(0, 0, 0, 0.19);
+    border-radius: 0 0 3px 3px;
+}
+
+
+
+
+.facet-header {
+    background: #208ec9;
+    /* background-image: linear-gradient(to bottom, #f9f9f9, #cfcfcf); */
+    height: 25px;
+    /* border-bottom: 1px solid #adadad; */
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -o-user-select: none;
+    -ms-user-select: none;
+    -khtml-user-select: none;
+    user-select: none;
+    border: 1px solid #0f6391;
+}
+
+.facet-title {
+    white-space: nowrap;
+    font-size: 12px;
+    height: 25px;
+    line-height: 25px;
+    color: white; /*#23436e;*/
+    cursor: pointer;
+    padding-left: 7px;
+    text-transform: uppercase;
+}
+
+.facet-body {
+    padding: 3px 0 5px 7px;
+}
+
+
+
+.facet-checkbox, .table-checkbox {
+    width: 13px;
+    height: 13px;
+    border: 1px solid #cccccc;
+    border-radius: 3px;
+    background: #F6F6F6;
+    cursor: pointer;
+    margin: 0px;
+    color: #2b2b2b
+}
+
+
+.facet-checkbox-label {
+    white-space: nowrap;
+    cursor: pointer;
+    padding: 1px 0 0 5px;
+    color: #757575;
+    font-size: 12px;
+    line-height: 16px;
+}
+
+
+
+/**************************************************************************/
+/** Map Styles
+/**************************************************************************/
+/** The following classes define the style for the coordinate readout and
+ *  status messages displayed on the map.
+ */
+.map-info {
+    background: rgba(255, 255, 255, 0.5);
+    font-family:"MS Sans Serif",tahoma,arial,helvetica,sans-serif;
+    font-size: 8pt;
+    color: rgba(0,0,0,0.85);
+    cursor: default;
+
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none;   /* Chrome/Safari/Opera */
+    -khtml-user-select: none;    /* Konqueror */
+    -moz-user-select: none;      /* Firefox */
+    -ms-user-select: none;       /* Internet Explorer/Edge */
+    user-select: none;           /* Non-prefixed version, currently
+                                    not supported by any browser */
+}
+
+.map-coords {
+    padding: 0 3px 0 0;
+    margin: 0 0 0 -5px;
+    overflow-x: hidden;
+    float:right;
+    width:100px;
+    text-align: right;
+}
+
+
+
+/**************************************************************************/
+/** Map Tile
+/**************************************************************************/
+
+.map-tile {
+    position: relative;
+    width: 175px;
+    height: 175px;
+    overflow: hidden;
+    margin: 21px;
+    opacity: 0.8;
+    transition: 0.4s;
+    cursor: pointer;
+    box-shadow: 0 2px 4px 0 rgba(0, 0, 0, 0.2), 0 3px 10px 0 rgba(0, 0, 0, 0.19);
+}
+
+.map-tile:hover{
+    opacity: 1;
+}
+
+.map-tile-label { /*used in conjunction with mapInfo*/
+    position: absolute;
+    right: 0;
+    padding: 2px;
+    border-radius: 0 0 0 4px;
+}
