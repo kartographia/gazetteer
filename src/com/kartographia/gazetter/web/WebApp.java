@@ -224,7 +224,7 @@ public class WebApp extends HttpServlet {
           //If we're still here, we either have a bad file request or a web
           //service request. In either case, send the request to the
           //webservices endpoint to process.
-            ws.processRequest(request, response);
+            ws.processRequest(service, request, response);
         }
     }
 

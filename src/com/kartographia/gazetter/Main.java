@@ -5,6 +5,7 @@ import javaxt.json.JSONObject;
 import javaxt.utils.Console;
 import javaxt.io.Jar;
 import javaxt.sql.*;
+import java.util.*;
 
 
 //******************************************************************************
@@ -77,6 +78,9 @@ public class Main {
                     "ERROR: Please specify a name of a source (e.g. \"VLIZ\") " +
                     "using the -import argument and use -path to specify a path " +
                     "to the shapefile");
+                }
+                else if (file.getExtension().equals("dictionary")){
+                    updateCountryNames(file);
                 }
                 else{
                     java.io.BufferedReader br = null;
@@ -168,6 +172,79 @@ public class Main {
             }
             catch(Exception e){
                 System.out.println(e.getMessage());
+            }
+        }
+    }
+
+
+  //**************************************************************************
+  //** updateCountryNames
+  //**************************************************************************
+  /** Used to update country names by adding records from the CountryNames
+   *  dictionary developed for the TEX app.
+   */
+    private static void updateCountryNames(javaxt.io.File file) throws Exception {
+
+
+      //Parse file and generate list of country names, grouped by country code
+        HashMap<String, ArrayList<String>> countryNames = new HashMap<>();
+        java.io.BufferedReader br = file.getBufferedReader("UTF-8");
+        String row;
+        while ((row = br.readLine()) != null){
+            if (row.startsWith("#")) continue;
+
+            String[] arr = row.split(";");
+            String name = arr[0].replace("\"", "").trim();
+            String cc = arr[1];
+
+            ArrayList<String> names = countryNames.get(cc);
+            if (names==null) {
+                names = new ArrayList<String>();
+                countryNames.put(cc, names);
+            }
+            names.add(name);
+        }
+
+
+      //Iterate through the list of names and update database as needed
+        Source source = null;
+        Iterator<String> it = countryNames.keySet().iterator();
+        while (it.hasNext()){
+            String cc = it.next();
+            ArrayList<String> names = countryNames.get(cc);
+            Place place = Place.get("type=","boundary","subtype=","country","country_code=", cc);
+            if (place==null){
+                System.out.println(
+                    "Missing entry for " + cc + " in the database. " +
+                    names.size() + " names will be skipped.");
+            }
+            else{
+
+                boolean updatePlace = false;
+                for (String name : names){
+                    boolean addName = true;
+                    for (Name placeName : place.getNames()){
+                        if (placeName.getLanguageCode().equals("eng")){
+                            if (placeName.getName().equalsIgnoreCase(name)){
+                                addName = false;
+                            }
+                        }
+                    }
+                    if (addName){
+                        Name placeName = new Name();
+                        placeName.setName(name);
+                        placeName.setLanguageCode("eng");
+                        placeName.setType(3); //varient
+                        if (source==null) source = Source.get("name=","PB");
+                        placeName.setSource(source);
+                        place.addName(placeName);
+                        updatePlace = true;
+                    }
+                }
+
+                if (updatePlace){
+                    place.save();
+                }
             }
         }
     }

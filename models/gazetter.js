@@ -64,7 +64,7 @@ var models = {
             {name: 'name',          type: 'string'},
             {name: 'uname',         type: 'string'}, //uppercase varient
             {name: 'languageCode',  type: 'char'}, //eng (English)
-            {name: 'type',          type: 'int'}, //1 (Common name), 2 (Formal name), 3 (Varient)
+            {name: 'type',          type: 'int'}, //1 (Common name), 2 (Formal name), 3 (Varient), 4 (People)
 
             {name: 'source',        type: 'Source'},
             {name: 'sourceKey',     type: 'long'},

@@ -1,6 +1,6 @@
 package com.kartographia.gazetter;
 import javaxt.express.utils.DbUtils;
-import javaxt.json.JSONObject;
+import javaxt.json.*;
 import javaxt.sql.*;
 
 //******************************************************************************
@@ -52,7 +52,7 @@ public class Config extends javaxt.express.Config {
 
 
       //Create sources as needed
-        for (String name : new String[]{"NGA", "USGS", "VLIZ", "OSM"}){
+        for (String name : new String[]{"NGA", "USGS", "VLIZ", "OSM", "PB"}){
             Source source = Source.get("name=",name);
             if (source==null){
                 source = new Source();
@@ -60,6 +60,14 @@ public class Config extends javaxt.express.Config {
                 source.save();
             }
         }
+    }
+
+
+  //**************************************************************************
+  //** getBaseMaps
+  //**************************************************************************
+    public static JSONArray getBaseMaps(){
+        return Config.get("basemaps").toJSONArray();
     }
 
 
