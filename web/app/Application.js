@@ -358,14 +358,14 @@ com.kartographia.gazetter.Application = function(parent, config) {
                 var aerial = getMapLayer("bing2", "a", basemaps);
                 addBaseMap("aerial", "Aerial", aerial, false);
 
-
+                /*
                 var blank = new ol.layer.Tile({
                     source: new ol.source.XYZ({
                        url: "data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVQIHWNgYGD4DwABBAEAHnOcQAAAAABJRU5ErkJggg=="
                     })
                 });
                 addBaseMap("blank", "Blank", blank, false);
-
+                */
             }
         });
 
@@ -658,7 +658,7 @@ com.kartographia.gazetter.Application = function(parent, config) {
             if (keyCode===13 || keyCode===39){ //right arrow or enter
                 showDetails(countryCode);
             }
-            else if (keyCode===32){
+            else if (keyCode===38 || keyCode===40){ //up and down arrows
                 zoomTo(countryCode);
             }
         };

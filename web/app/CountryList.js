@@ -300,16 +300,21 @@ com.kartographia.gazetter.CountryList = function(parent, config) {
 
             if (document.activeElement.parentNode!==div.innerDiv) return;
 
+            var el = getSelectedRow();
+            
             if (e.keyCode===38){ //up arrow
-                var el = getSelectedRow();
-                if (el.previousSibling) el.previousSibling.focus();
+                if (el.previousSibling){
+                    el.previousSibling.focus();
+                    me.onKeyPress(e.keyCode, el.previousSibling.countryCode);
+                }
             }
             else if (e.keyCode===40){ //down arrow
-                var el = getSelectedRow();
-                if (el.nextSibling) el.nextSibling.focus();
+                if (el.nextSibling){
+                    el.nextSibling.focus();
+                    me.onKeyPress(e.keyCode, el.nextSibling.countryCode);
+                }
             }
             else{
-                var el = getSelectedRow();
                 me.onKeyPress(e.keyCode, el.countryCode);
             }
         });

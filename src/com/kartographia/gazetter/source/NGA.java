@@ -175,7 +175,7 @@ public class NGA {
                 Place place = new Place();
                 place.setCountryCode(cc);
                 place.setAdmin1(a1);
-                updateUKTerritories(place);
+                //updateUKTerritories(place);
 
 
 

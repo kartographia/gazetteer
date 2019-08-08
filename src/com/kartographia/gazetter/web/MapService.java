@@ -2,7 +2,6 @@ package com.kartographia.gazetter.web;
 import com.kartographia.gazetter.*;
 
 //webservice includes
-import com.kartographia.map.MapTile;
 import javaxt.express.ws.ServiceRequest;
 import javaxt.express.ws.ServiceResponse;
 import javaxt.express.ws.WebService;
@@ -24,8 +23,7 @@ import javaxt.utils.Console;
 //jts includes
 import com.vividsolutions.jts.geom.*;
 import com.vividsolutions.jts.io.WKTReader;
-import com.vividsolutions.jts.io.WKTWriter;
-import com.vividsolutions.jts.operation.union.CascadedPolygonUnion;
+
 
 //******************************************************************************
 //**  MapService
@@ -117,7 +115,7 @@ public class MapService extends WebService {
       //Create map tile
         MapTile mapTile;
         if (srid==4326){
-            mapTile = new MapTile(west, south, east, north, width, height);
+            mapTile = new MapTile(west, south, east, north, width, height, 4326);
         }
         else{
             double[] sw = get3857(south, west);
@@ -245,10 +243,6 @@ public class MapService extends WebService {
 
 
 
-
-
-
-
   //**************************************************************************
   //** getSelect
   //**************************************************************************
@@ -259,6 +253,9 @@ public class MapService extends WebService {
         if (layer.equals("points")){ //e.g. map/select/points/?...
             return selectPoints(request, database);
         }
+        else if (layer.equals("polygons")){ //e.g. map/select/polygons/?...
+            return selectPolygons(request, database);
+        }
         else{
             return new ServiceResponse(500, "Not Implemented");
         }
@@ -268,9 +265,8 @@ public class MapService extends WebService {
   //**************************************************************************
   //** selectPoints
   //**************************************************************************
-  /** Returns a list of points (device locations) that are within a certain
-   *  distance of a given coordinate. Additional filters include a date range
-   *  (e.g. 2018/12/31/01) and timezone.
+  /** Returns a list of points (cities, towns, etc) that are within a certain
+   *  distance of a given coordinate.
    */
     private ServiceResponse selectPoints(ServiceRequest request, Database database)
         throws ServletException, IOException {
@@ -380,6 +376,88 @@ public class MapService extends WebService {
     }
 
 
+    private ServiceResponse selectPolygons(ServiceRequest request, Database database)
+        throws ServletException, IOException {
+
+
+      //Parse parameters
+        String geom = request.getParameter("geom").toString();
+        Double lat = request.getParameter("lat").toDouble();
+        Double lon = request.getParameter("lon").toDouble();
+        Double buffer = request.getParameter("buffer").toDouble(); //in meters
+
+
+
+        String wkt = null;
+        boolean useGeom = false;
+        if (lat==null && lon==null){
+            if (geom!=null){
+                wkt = geom;
+                useGeom = true;
+            }
+        }
+        else{
+            wkt = "POINT(" + lon + " " + lat + ")";
+        }
+        if (wkt==null){
+            return new ServiceResponse(500, "A coordinate or geometry is required");
+        }
+
+
+        String sql = "with vars as ( select " +
+        (useGeom ? (
+            "ST_GeomFromText('" + wkt + "', 4326)"
+        )
+            : //else
+        (
+
+            "st_transform(" +
+            "    st_buffer(" +
+            "      st_transform(ST_GeomFromText('" + wkt + "', 4326), 900913)," +
+            "      " + buffer + //radius in meters
+            "    )," +
+            "    4326" +
+            ")"
+
+        )) + " ) \n" +
+
+        "select n, cc, st_astext(g) as g \n" +
+        "st_distance(g, ST_Centroid(ST_GeomFromText('" + wkt + "',4326)), true) as distance \n" +
+        "from (\n" +
+        "SELECT n, country_code as cc, ST_GeometryN(geom, n) as g\n" +
+        "FROM gazetter.place\n" +
+        "   CROSS JOIN generate_series(1,(100)) n \n" + //limit of 100?
+        "WHERE n <= ST_NumGeometries(geom) \n" +
+        "and st_intersects(geom, (select geom from vars))\n" +
+        ") as q\n" +
+        "where st_intersects(g, (select geom from vars))";
+
+
+
+
+      //Execute query and return response
+        Connection conn = null;
+        try{
+            JSONArray arr = new JSONArray();
+            conn = database.getConnection();
+            for (Recordset rs : conn.getRecordset(sql)){
+                JSONObject json = new JSONObject();
+                json.set("n", rs.getValue("n"));
+                json.set("g", rs.getValue("g"));
+                json.set("cc", rs.getValue("cc"));
+                json.set("distance", rs.getValue("distance"));
+                arr.add(json);
+            }
+
+            conn.close();
+            return new ServiceResponse(arr);
+        }
+        catch(Exception e){
+            if (conn!=null) conn.close();
+            return new ServiceResponse(e);
+        }
+
+    }
 
 
 
