@@ -42,9 +42,6 @@ var models = {
             {name: 'info',          type: 'json'},
             {name: 'lastModified',  type: 'date'}
         ],
-        hasMany: [
-            {model: 'Name',     name: 'names'}
-        ],
         constraints: [
             {name: 'countryCode',   required: true,  length: 2},
             {name: 'admin1',        length: 2},
@@ -65,7 +62,7 @@ var models = {
             {name: 'uname',         type: 'string'}, //uppercase varient
             {name: 'languageCode',  type: 'char'}, //eng (English)
             {name: 'type',          type: 'int'}, //1 (Common name), 2 (Formal name), 3 (Varient), 4 (People)
-
+            {name: 'place',         type: 'Place'},
             {name: 'source',        type: 'Source'},
             {name: 'sourceKey',     type: 'long'},
             {name: 'sourceDate',    type: 'int'}, //YYYYMMDD in utc
@@ -77,6 +74,7 @@ var models = {
             {name: 'name',          required: true},
             {name: 'languageCode',  length: 3},
             {name: 'type',          required: true},
+            {name: 'place',         required: true},
             {name: 'source',        required: true}
         ]
     },
