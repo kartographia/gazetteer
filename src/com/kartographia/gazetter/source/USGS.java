@@ -2,10 +2,24 @@ package com.kartographia.gazetter.source;
 import com.kartographia.gazetter.*;
 import com.kartographia.gazetter.source.Utils.*;
 import com.vividsolutions.jts.geom.*;
+
+//javaxt includes
 import javaxt.json.*;
 import javaxt.sql.*;
+import javaxt.io.*;
+import javaxt.utils.ThreadPool;
+import static javaxt.utils.Console.console;
+
+//java includes
 import java.util.*;
+import java.util.zip.*;
 import java.math.BigDecimal;
+import java.io.BufferedInputStream;
+import java.io.BufferedReader;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.sql.PreparedStatement;
+
 
 //******************************************************************************
 //**  USGS Data Loader
@@ -42,20 +56,184 @@ public class USGS {
    *  @param file "Populated Places" found under "Topical Gazetteers". Example:
    *  http://geonames.usgs.gov/docs/stategaz/POP_PLACES_20161001.zip
    */
-    public static void load(javaxt.io.File file, Database database) throws Exception {
+    public static void load(File file, int numThreads, Database database) throws Exception {
         Source source = Source.get("name=","USGS");
 
 
       //Get record count
-        Counter counter = new Counter(file, true);
+        Counter counter = new Counter(getBufferedReader(file), true);
 
 
-      //Create prepared statement to find places
-        java.sql.PreparedStatement placeQuery;
-        javaxt.sql.Connection conn = database.getConnection();
-        placeQuery = conn.getConnection().prepareStatement(
-            "select id, source_date from gazetter.place where source_id=? and source_key=? and country_code=?"
-        );
+
+      //Create threads to process records in the file
+        ThreadPool pool = new ThreadPool(numThreads){ //no limit?
+            public void process(Object obj){
+                String row = (String) obj;
+                counter.updateCount();
+
+
+              //Parse columns
+                String[] col = row.split(delimiter, -1);
+                long id = Long.parseLong(col[0]);
+                String name = col[1];
+                String subType = col[2];
+                String type = typeMap.get(subType);
+                if (type==null) return;
+                String cc = "US";
+                String a1 = col[3];
+                String a2 = col[5];
+                BigDecimal lat = new BigDecimal(col[9]);
+                BigDecimal lon = new BigDecimal(col[10]);
+                Integer lastUpdate = getDate(col[19]); //Date edited (e.g. 05/13/2010)
+                if (lastUpdate==null) lastUpdate = getDate(col[18]); //Date created (e.g. 03/31/1981)
+
+                JSONObject info = new JSONObject();
+                info.set("latitude", lat);
+                info.set("longitude", lon);
+                Geometry geom = geometryFactory.createPoint(
+                    new Coordinate(lon.doubleValue(), lat.doubleValue())
+                );
+
+                Integer rank = getRank(id);
+                if (!type.equals("residential")) rank = null;
+
+                if (name.endsWith("(historical)")){
+                    name = name.substring(0, name.length()-"(historical)".length()).trim();
+                    info.set("note", "historical");
+                }
+
+
+              //Instantiate Place
+                Place place = new Place();
+                place.setCountryCode(cc);
+                place.setAdmin1(a1);
+                place.setAdmin2(a2);
+                place.setGeom(geom);
+                place.setType(type);
+                place.setSubtype(subType);
+                place.setRank(rank);
+                place.setSource(source);
+                place.setSourceKey(id);
+                place.setSourceDate(lastUpdate);
+                place.setInfo(info);
+
+
+              //Update
+                updateUSTerritories(place);
+                name = updateBuildings(name, place);
+
+
+              //Add name
+                Name placeName = new Name();
+                placeName.setName(name);
+                placeName.setLanguageCode("eng");
+                placeName.setType(2);
+                placeName.setSource(source);
+                placeName.setSourceKey(id);
+                placeName.setSourceDate(lastUpdate);
+
+
+
+              //Save place
+                try{
+                    place.save();
+                }
+                catch(Exception e){
+                    if (e instanceof IllegalStateException){
+                        return;
+                    }
+                    else{
+                        String msg = e.getMessage();
+                        if (msg.contains("duplicate key")){
+                            update(place);
+                        }
+                        else{
+                            console.log(e.getMessage());
+                        }
+                    }
+                }
+
+
+              //Save name
+                try{
+                    placeName.setPlace(place);
+                    placeName.save();
+                }
+                catch(Exception e){
+                    if (e instanceof IllegalStateException){
+                        return;
+                    }
+                    else{
+                        String msg = e.getMessage();
+                        if (msg.contains("duplicate key")){
+
+                        }
+                        else{
+                            console.log(e.getMessage());
+                        }
+                    }
+                }
+            }
+
+
+            private void update(Place place){
+                try{
+                    Long placeID = null;
+                    Integer currDate = null;
+                    PreparedStatement placeQuery = getPlaceQuery();
+                    placeQuery.setLong(1, source.getID());
+                    placeQuery.setLong(2, place.getSourceKey());
+                    placeQuery.setString(3, place.getCountryCode());
+                    java.sql.ResultSet r2 = placeQuery.executeQuery();
+                    while (r2.next()) {
+                        placeID = r2.getLong(1);
+                        currDate = r2.getInt(2);
+                    }
+                    r2.close();
+
+                    place.setID(placeID);
+
+                    int lastUpdate = place.getSourceDate();
+                    if (lastUpdate>currDate){
+                        ChangeRequest cr = new ChangeRequest();
+                        cr.setPlace(place);
+                        cr.setInfo(place.toJson());
+                        cr.save();
+                    }
+                }
+                catch(Exception e){
+                }
+            }
+
+            private PreparedStatement getPlaceQuery() throws Exception {
+                PreparedStatement stmt = (PreparedStatement) get("stmt");
+                if (stmt==null){
+                    Connection conn = (Connection) get("conn");
+                    if (conn==null){
+                        conn = database.getConnection();
+                        set("conn", conn);
+                    }
+
+                    stmt = conn.getConnection().prepareStatement(
+                        "select id, source_date from gazetter.place where source_id=? and source_key=? and country_code=?"
+                    );
+                    set("stmt", stmt);
+                }
+                return stmt;
+            }
+
+            public void exit(){
+                PreparedStatement stmt = (PreparedStatement) get("stmt");
+                if (stmt!=null) try{stmt.close();}catch(Exception e){}
+
+                Connection conn = (Connection) get("conn");
+                if (conn!=null) conn.close();
+            }
+
+        }.start();
+
+
+
 
 
       //Parse file
@@ -63,107 +241,103 @@ public class USGS {
         br.readLine(); //Skip header
         String row;
         while ((row = br.readLine()) != null){
-            counter.updateCount();
+            pool.add(row);
+        }
+        br.close();
 
 
-          //Parse columns
-            String[] col = row.split(delimiter, -1);
-            long id = Long.parseLong(col[0]);
-            String name = col[1];
-            String subType = col[2];
-            String type = typeMap.get(subType);
-            if (type==null) continue;
-            String cc = "US";
-            String a1 = col[3];
-            String a2 = col[5];
-            BigDecimal lat = new BigDecimal(col[9]);
-            BigDecimal lon = new BigDecimal(col[10]);
-            Integer lastUpdate = getDate(col[19]); //Date edited (e.g. 05/13/2010)
-            if (lastUpdate==null) lastUpdate = getDate(col[18]); //Date created (e.g. 03/31/1981)
-
-            JSONObject info = new JSONObject();
-            info.set("latitude", lat);
-            info.set("longitude", lon);
-            Geometry geom = geometryFactory.createPoint(
-                new Coordinate(lon.doubleValue(), lat.doubleValue())
-            );
-
-            Integer rank = getRank(id);
-            if (!type.equals("residential")) rank = null;
-
-            if (name.endsWith("(historical)")){
-                name = name.substring(0, name.length()-"(historical)".length()).trim();
-                info.set("note", "historical");
-            }
+        pool.done();
+        pool.join();
+    }
 
 
-          //Instantiate Place
-            Place place = new Place();
-            place.setCountryCode(cc);
-            place.setAdmin1(a1);
-            place.setAdmin2(a2);
-            place.setGeom(geom);
-            place.setType(type);
-            place.setSubtype(subType);
-            place.setRank(rank);
-            place.setSource(source);
-            place.setSourceKey(id);
-            place.setSourceDate(lastUpdate);
-            place.setInfo(info);
+  //**************************************************************************
+  //** download
+  //**************************************************************************
+  /** Used to download the "National File" from the USGS website
+   */
+    public static File download(Directory downloadDir, boolean unzip) throws Exception {
+        java.net.URL url = new java.net.URL("https://www.usgs.gov/core-science-systems/ngp/board-on-geographic-names/download-gnis-data");
+        javaxt.http.Response response = new javaxt.http.Request(url).getResponse();
+        if (response.getStatus()!=200) throw new Exception("Failed to connect to " + url);
+        String html = response.getText();
 
-
-          //Update
-            updateUSTerritories(place);
-            name = updateBuildings(name, place);
-
-
-          //Add name
-            Name placeName = new Name();
-            placeName.setName(name);
-            placeName.setLanguageCode("eng");
-            placeName.setType(2);
-            placeName.setSource(source);
-            placeName.setSourceKey(id);
-            placeName.setSourceDate(lastUpdate);
-            place.addName(placeName);
-
-
-          //Save place
-            try{
-                place.save();
-            }
-            catch(Exception e){
-                //probably a duplicate
-
-                Long placeID = null;
-                Integer currDate = null;
-                placeQuery.setLong(1, source.getID());
-                placeQuery.setLong(2, id);
-                placeQuery.setString(3, place.getCountryCode());
-                java.sql.ResultSet r2 = placeQuery.executeQuery();
-                while (r2.next()) {
-                    placeID = r2.getLong(1);
-                    currDate = r2.getInt(2);
+        File file = null;
+        for (javaxt.html.Element el : new javaxt.html.Parser(html).getElementsByTagName("a")){
+            String text = el.getInnerText();
+            if (text.equals("National File")){
+                String href = el.getAttribute("href");
+                String link = javaxt.html.Parser.MapPath(href, url);
+                String path = new javaxt.utils.URL(link).getPath();
+                if (path.endsWith("/")) path = path.substring(0, path.length()-1);
+                String fileName = path.substring(path.lastIndexOf("/")+1);
+                file = new File(downloadDir + "usgs/" + fileName);
+                if (!file.exists()){
+                    response = new javaxt.http.Request(link).getResponse();
+                    if (response.getStatus()!=200) throw new Exception("Failed to download " + link);
+                    System.out.print("Downloading " + file.getName() + "...");
+                    java.io.InputStream is = response.getInputStream();
+                    file.write(is);
+                    is.close();
+                    System.out.println("Done!");
                 }
-                r2.close();
-
-                place.setID(placeID);
-
-
-                if (lastUpdate>currDate){
-                    ChangeRequest cr = new ChangeRequest();
-                    cr.setPlace(place);
-                    cr.setInfo(place.toJson());
-                    cr.save();
-                }
+                break;
             }
         }
 
 
-      //Clean-up
-        placeQuery.close();
-        conn.close();
-        br.close();
+
+        if (file==null) throw new Exception("Failed to find file to download");
+
+        if (unzip){
+            File countryFile = new File(file.getDirectory(), file.getName(false) + ".txt");
+            ZipInputStream zip = new ZipInputStream(file.getInputStream());
+            ZipEntry entry;
+            while((entry = zip.getNextEntry())!=null){
+                String fileName = entry.getName();
+                if (fileName.startsWith("NationalFile_")){
+                    byte[] buffer = new byte[2048];
+                    java.io.FileOutputStream output = countryFile.getOutputStream();
+                    int len;
+                    while ((len = zip.read(buffer)) > 0){
+                        output.write(buffer, 0, len);
+                        output.flush();
+                    }
+                    output.close();
+                    break;
+                }
+            }
+            zip.close();
+        }
+
+        return file;
+    }
+
+
+  //**************************************************************************
+  //** getBufferedReader
+  //**************************************************************************
+    private static BufferedReader getBufferedReader(File file) throws Exception {
+        if (file.getExtension().equals("zip")){
+            ZipFile zipFile = new ZipFile(file.toFile());
+
+            BufferedInputStream bis = new BufferedInputStream(file.getInputStream());
+            ZipInputStream zip = new ZipInputStream(bis);
+            ZipEntry zipEntry;
+            while ((zipEntry = zip.getNextEntry()) != null) {
+                if (!zipEntry.isDirectory()) {
+                    final String fileName = zipEntry.getName();
+                    if (fileName.startsWith("NationalFile_")){
+                        InputStream is = zipFile.getInputStream(zipEntry);
+                        return new BufferedReader(new InputStreamReader(is, "UTF-8"));
+                    }
+                }
+            }
+        }
+        else{
+            return file.getBufferedReader("UTF-8");
+        }
+        return null;
     }
 
 
@@ -233,7 +407,7 @@ public class USGS {
    *  values are the FIPS Country codes that NGA uses.
    */
     private static HashMap<String, String> getTerritories(){
-        HashMap<String, String> cc = new HashMap<String, String>();
+        HashMap<String, String> cc = new HashMap<>();
         cc.put("AS", "AQ");
         cc.put("MP", "CQ");
         cc.put("FM", "FM");
@@ -243,22 +417,6 @@ public class USGS {
         cc.put("PR", "RQ");
         cc.put("VI", "VQ");
         return cc;
-    }
-
-
-  //**************************************************************************
-  //** checkForUpdates
-  //**************************************************************************
-    public int checkForUpdates(Database db){
-        return 0;
-    }
-
-
-  //**************************************************************************
-  //** downloadUpdates
-  //**************************************************************************
-    public javaxt.io.File[] downloadUpdates(Database db, javaxt.io.Directory downloadDir){
-        return new javaxt.io.File[0];
     }
 
 

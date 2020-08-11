@@ -72,16 +72,17 @@ public class VLIZ {
             JSONObject json = new JSONObject();
             json.set("source", file.getName());
             place.setInfo(json);
-
+            place.save();
 
             Name placeName = new Name();
             placeName.setName(name);
             placeName.setLanguageCode("eng");
             placeName.setType(2); //2=formal
             placeName.setSource(source);
-            place.addName(placeName);
+            
 
-            place.save();
+            placeName.setPlace(place);
+            placeName.save();
         }
 
     }

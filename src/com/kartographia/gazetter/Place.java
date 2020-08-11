@@ -3,7 +3,6 @@ import javaxt.json.*;
 import java.sql.SQLException;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.WKTReader;
-import java.util.ArrayList;
 import javaxt.utils.Date;
 
 //******************************************************************************
@@ -28,7 +27,6 @@ public class Place extends javaxt.sql.Model {
     private Integer sourceDate;
     private JSONObject info;
     private Date lastModified;
-    private ArrayList<Name> names;
 
 
   //**************************************************************************
@@ -36,7 +34,7 @@ public class Place extends javaxt.sql.Model {
   //**************************************************************************
     public Place(){
         super("gazetter.place", new java.util.HashMap<String, String>() {{
-
+            
             put("countryCode", "country_code");
             put("admin1", "admin1");
             put("admin2", "admin2");
@@ -49,10 +47,9 @@ public class Place extends javaxt.sql.Model {
             put("sourceDate", "source_date");
             put("info", "info");
             put("lastModified", "last_modified");
-            put("names", "names");
 
         }});
-        names = new ArrayList<Name>();
+        
     }
 
 
@@ -102,29 +99,6 @@ public class Place extends javaxt.sql.Model {
             this.lastModified = getValue(rs, "last_modified").toDate();
 
 
-            javaxt.sql.Connection conn = null;
-            try{
-                conn = getConnection(this.getClass());
-
-
-              //Set names
-                ArrayList<Long> nameIDs = new ArrayList<Long>();
-                for (javaxt.sql.Recordset row : conn.getRecordset(
-                    "select name_id from gazetter.place_name where place_id="+id)){
-                    nameIDs.add(row.getValue(0).toLong());
-                }
-                for (long nameID : nameIDs){
-                    names.add(new Name(nameID));
-                }
-
-                conn.close();
-            }
-            catch(SQLException e){
-                if (conn!=null) conn.close();
-                throw e;
-            }
-
-
 
           //Set source
             if (sourceID!=null) source = new Source(sourceID);
@@ -159,18 +133,16 @@ public class Place extends javaxt.sql.Model {
         if (json.has("source")){
             source = new Source(json.get("source").toJSONObject());
         }
+        else if (json.has("sourceID")){
+            try{
+                source = new Source(json.get("sourceID").toLong());
+            }
+            catch(Exception e){}
+        }
         this.sourceKey = json.get("sourceKey").toLong();
         this.sourceDate = json.get("sourceDate").toInteger();
         this.info = json.get("info").toJSONObject();
         this.lastModified = json.get("lastModified").toDate();
-
-      //Set names
-        if (json.has("names")){
-            JSONArray _names = json.get("names").toJSONArray();
-            for (int i=0; i<_names.length(); i++){
-                names.add(new Name(_names.get(i).toJSONObject()));
-            }
-        }
     }
 
 
@@ -265,62 +237,8 @@ public class Place extends javaxt.sql.Model {
     public Date getLastModified(){
         return lastModified;
     }
-
-    public Name[] getNames(){
-        return names.toArray(new Name[names.size()]);
-    }
-
-    public void setNames(Name[] arr){
-        names = new ArrayList<Name>();
-        for (int i=0; i<arr.length; i++){
-            names.add(arr[i]);
-        }
-    }
-
-    public void addName(Name name){
-        this.names.add(name);
-    }
-
-  //**************************************************************************
-  //** save
-  //**************************************************************************
-  /** Used to save a Place in the database.
-   */
-    public void save() throws SQLException {
-        super.save();
-        javaxt.sql.Connection conn = null;
-        try{
-            conn = getConnection(this.getClass());
-            javaxt.sql.Recordset rs = new javaxt.sql.Recordset();
-
-          //Save names
-            ArrayList<Long> nameIDs = new ArrayList<Long>();
-            for (Name obj : names){
-                obj.save();
-                nameIDs.add(obj.getID());
-            }
-            for (long nameID : nameIDs){
-                rs.open("select * from gazetter.place_name where place_id=" + id +
-                " and name_id=" + nameID, conn, false);
-                if (rs.EOF){
-                    rs.addNew();
-                    rs.setValue("place_id", id);
-                    rs.setValue("name_id", nameID);
-                    rs.update();
-                }
-                rs.close();
-            }
-
-
-            conn.close();
-        }
-        catch(SQLException e){
-            if (conn!=null) conn.close();
-            throw e;
-        }
-    }
-
-
+    
+    
 
 
   //**************************************************************************

@@ -10,7 +10,6 @@ import javaxt.io.*;
 import javaxt.utils.ThreadPool;
 import static javaxt.utils.Console.console;
 
-
 //java includes
 import java.util.*;
 import java.util.zip.*;
@@ -209,6 +208,26 @@ public class NGA {
 
 
 
+                    try{
+                        place.save();
+                    }
+                    catch(Exception e){
+                        if (e instanceof IllegalStateException){
+                            return;
+                        }
+                        else{
+                            String msg = e.getMessage();
+                            if (msg.contains("duplicate key")){
+                                update(place);
+                            }
+                            else{
+                                console.log(e.getMessage());
+                            }
+                        }
+                    }
+
+
+
                   //Add place names
                     String name =    col[22]; //Full name
                     String altName = col[23]; //Same as the full name but the character/diacritic combinations and special characters are substituted
@@ -223,7 +242,24 @@ public class NGA {
                     placeName.setSource(source);
                     placeName.setSourceKey(id);
                     placeName.setSourceDate(lastUpdate);
-                    place.addName(placeName);
+                    placeName.setPlace(place);
+                    try{
+                        placeName.save();
+                    }
+                    catch(Exception e){
+                        if (e instanceof IllegalStateException){
+                            return;
+                        }
+                        else{
+                            String msg = e.getMessage();
+                            if (msg.contains("duplicate key")){
+                                update(place);
+                            }
+                            else{
+                                console.log(e.getMessage());
+                            }
+                        }
+                    }
 
 
                     if (!name.equals(altName)){
@@ -234,22 +270,27 @@ public class NGA {
                         placeName.setSource(source);
                         placeName.setSourceKey(id);
                         placeName.setSourceDate(lastUpdate);
-                        place.addName(placeName);
-                    }
-
-
-
-                    try{
-                        place.save();
-                    }
-                    catch(Exception e){
-                        if (e instanceof IllegalStateException){
-                            return;
+                        placeName.setPlace(place);
+                        try{
+                            placeName.save();
                         }
-                        else{ //probably a duplicate
-                            update(place);
+                        catch(Exception e){
+                            if (e instanceof IllegalStateException){
+                                return;
+                            }
+                            else{ //probably a duplicate
+                                String msg = e.getMessage();
+                                if (msg.contains("duplicate key")){
+                                    update(place);
+                                }
+                                else{
+                                    console.log(e.getMessage());
+                                }
+                            }
                         }
                     }
+
+
                 }
             }
 

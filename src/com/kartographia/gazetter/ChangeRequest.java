@@ -97,6 +97,12 @@ public class ChangeRequest extends javaxt.sql.Model {
         if (json.has("place")){
             place = new Place(json.get("place").toJSONObject());
         }
+        else if (json.has("placeID")){
+            try{
+                place = new Place(json.get("placeID").toLong());
+            }
+            catch(Exception e){}
+        }
         this.info = json.get("info").toJSONObject();
         this.status = json.get("status").toString();
         this.lastModified = json.get("lastModified").toDate();

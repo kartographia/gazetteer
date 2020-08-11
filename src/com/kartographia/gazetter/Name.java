@@ -17,6 +17,7 @@ public class Name extends javaxt.sql.Model {
     private String uname;
     private String languageCode;
     private Integer type;
+    private Place place;
     private Source source;
     private Long sourceKey;
     private Integer sourceDate;
@@ -34,6 +35,7 @@ public class Name extends javaxt.sql.Model {
             put("uname", "uname");
             put("languageCode", "language_code");
             put("type", "type");
+            put("place", "place_id");
             put("source", "source_id");
             put("sourceKey", "source_key");
             put("sourceDate", "source_date");
@@ -81,12 +83,17 @@ public class Name extends javaxt.sql.Model {
             this.uname = getValue(rs, "uname").toString();
             this.languageCode = getValue(rs, "language_code").toString();
             this.type = getValue(rs, "type").toInteger();
+            Long placeID = getValue(rs, "place_id").toLong();
             Long sourceID = getValue(rs, "source_id").toLong();
             this.sourceKey = getValue(rs, "source_key").toLong();
             this.sourceDate = getValue(rs, "source_date").toInteger();
             this.info = new JSONObject(getValue(rs, "info").toString());
             this.lastModified = getValue(rs, "last_modified").toDate();
 
+
+
+          //Set place
+            if (placeID!=null) place = new Place(placeID);
 
 
           //Set source
@@ -113,8 +120,23 @@ public class Name extends javaxt.sql.Model {
         this.uname = json.get("uname").toString();
         this.languageCode = json.get("languageCode").toString();
         this.type = json.get("type").toInteger();
+        if (json.has("place")){
+            place = new Place(json.get("place").toJSONObject());
+        }
+        else if (json.has("placeID")){
+            try{
+                place = new Place(json.get("placeID").toLong());
+            }
+            catch(Exception e){}
+        }
         if (json.has("source")){
             source = new Source(json.get("source").toJSONObject());
+        }
+        else if (json.has("sourceID")){
+            try{
+                source = new Source(json.get("sourceID").toLong());
+            }
+            catch(Exception e){}
         }
         this.sourceKey = json.get("sourceKey").toLong();
         this.sourceDate = json.get("sourceDate").toInteger();
@@ -153,6 +175,14 @@ public class Name extends javaxt.sql.Model {
 
     public void setType(Integer type){
         this.type = type;
+    }
+
+    public Place getPlace(){
+        return place;
+    }
+
+    public void setPlace(Place place){
+        this.place = place;
     }
 
     public Source getSource(){

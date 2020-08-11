@@ -136,7 +136,7 @@ public class WebServices extends WebService {
         json.remove("lastModified");
         if (!json.has("languageCode")) json.set("languageCode", "eng");
 
-        
+
       //Create or update the place name
         try{
             Long nameID = request.getID();
@@ -150,21 +150,21 @@ public class WebServices extends WebService {
                 Name placeName = new Name(json);
 
 
-                boolean addName = true;
-                for (Name name : place.getNames()){
-                    if (name.getName().equalsIgnoreCase(placeName.getName())){
-                        name.update(request.getJson());
-                        name.save();
-                        placeName = name;
-                        addName = false;
-                        break;
-                    }
-                }
-
-                if (addName){
-                    place.addName(placeName);
-                    place.save();
-                }
+//                boolean addName = true;
+//                for (Name name : place.getNames()){
+//                    if (name.getName().equalsIgnoreCase(placeName.getName())){
+//                        name.update(request.getJson());
+//                        name.save();
+//                        placeName = name;
+//                        addName = false;
+//                        break;
+//                    }
+//                }
+//
+//                if (addName){
+//                    place.addName(placeName);
+//                    place.save();
+//                }
 
             }
             else{

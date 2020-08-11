@@ -77,22 +77,22 @@ public class VMAP {
             placeName.setLanguageCode("eng");
             placeName.setType(2); //2=formal
             placeName.setSource(source);
-            place.addName(placeName);
 
             try{
                 place.save();
+                placeName.setPlace(place);
+                placeName.save();
             }
             catch(Exception e){
                 System.out.println("Error saving \"" + name + "\" (" + cc + ")");
                 e.printStackTrace();
             }
         }
-
     }
 
 
 
-    private void intesectPolygons(javaxt.sql.Connection conn) throws java.sql.SQLException {
+    private void intersectPolygons(javaxt.sql.Connection conn) throws java.sql.SQLException {
         javaxt.sql.Recordset rs = new javaxt.sql.Recordset();
         String sql = "Select gid, nam from vmap_cities";
         rs.open(sql, conn);

@@ -100,7 +100,7 @@ public class Main {
 
 
                         if (header.startsWith("FEATURE_ID|")){
-                            USGS.load(file, database);
+                            USGS.load(file, numThreads, database);
                         }
                         else if (header.startsWith("RC\t")){
                             NGA.load(file, numThreads, database);
@@ -134,7 +134,7 @@ public class Main {
                         NGA.load(file, numThreads, database);
                     }
                     else if (source.equalsIgnoreCase("USGS")){
-                        USGS.load(file, database);
+                        USGS.load(file, numThreads, database);
                     }
                     else if (source.equalsIgnoreCase("Census")){
                         USCensus.load(file, database);
@@ -166,10 +166,14 @@ public class Main {
             int numThreads = 12;
             try{numThreads = Integer.parseInt(args.get("-t"));}catch(Exception e){}
 
-            
+
             if (source.equalsIgnoreCase("NGA")){
                 File file = NGA.download(downloadDir, false);
                 NGA.load(file, numThreads, database);
+            }
+            else if (source.equalsIgnoreCase("USGS")){
+                File file = USGS.download(downloadDir, false);
+                USGS.load(file, numThreads, database);
             }
 
         }
@@ -244,23 +248,25 @@ public class Main {
                 boolean updatePlace = false;
                 for (String name : names){
                     boolean addName = true;
-                    for (Name placeName : place.getNames()){
-                        if (placeName.getLanguageCode().equals("eng")){
-                            if (placeName.getName().equalsIgnoreCase(name)){
-                                addName = false;
-                            }
-                        }
-                    }
-                    if (addName){
-                        Name placeName = new Name();
-                        placeName.setName(name);
-                        placeName.setLanguageCode("eng");
-                        placeName.setType(3); //varient
-                        if (source==null) source = Source.get("name=","PB");
-                        placeName.setSource(source);
-                        place.addName(placeName);
-                        updatePlace = true;
-                    }
+
+
+//                    for (Name placeName : place.getNames()){
+//                        if (placeName.getLanguageCode().equals("eng")){
+//                            if (placeName.getName().equalsIgnoreCase(name)){
+//                                addName = false;
+//                            }
+//                        }
+//                    }
+//                    if (addName){
+//                        Name placeName = new Name();
+//                        placeName.setName(name);
+//                        placeName.setLanguageCode("eng");
+//                        placeName.setType(3); //varient
+//                        if (source==null) source = Source.get("name=","PB");
+//                        placeName.setSource(source);
+//                        place.addName(placeName);
+//                        updatePlace = true;
+//                    }
                 }
 
                 if (updatePlace){
