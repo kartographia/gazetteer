@@ -75,7 +75,7 @@ var models = {
         ],
         constraints: [
             {name: 'name',          required: true},
-            {name: 'languageCode',  required: true, length: 3},
+            {name: 'languageCode',  length: 3},
             {name: 'type',          required: true},
             {name: 'source',        required: true}
         ]
