@@ -1,8 +1,12 @@
 package com.kartographia.gazetter.source;
 import com.kartographia.gazetter.*;
-import java.sql.SQLException;
+
 import javaxt.sql.*;
+
 import java.util.*;
+import java.util.concurrent.atomic.AtomicLong;
+import java.sql.SQLException;
+
 
 public class Utils {
 
@@ -68,7 +72,7 @@ public class Utils {
         private String statusText = "Status: 0  %  ETC: ---------- --:-- --";
         private int percentComplete = 0;
         private long ttl;
-        private long x = 0;
+        private AtomicLong counter;
         private long startTime;
 
       //Instantiate the counter with a known record count
@@ -77,35 +81,41 @@ public class Utils {
             init();
         }
 
+        public Counter(javaxt.io.File file, boolean skipHeader) throws Exception {
+            this(file.getBufferedReader("UTF-8"), skipHeader);
+        }
 
       //Instantiate the counter using a tsv/csv file
-        public Counter(javaxt.io.File file, boolean skipHeader) throws Exception {
-            ttl = 0L;
+        public Counter(java.io.BufferedReader br, boolean skipHeader) throws Exception {
             System.out.print("Analyzing File...");
             long t = System.currentTimeMillis();
-            java.io.BufferedReader br = file.getBufferedReader("UTF-8");
-            if (skipHeader) br.readLine();
-            while (br.readLine()!=null){
-                ttl++;
-            }
-            br.close();
+            countRows(br, skipHeader);
             String elapsedTime = getElapsedTime(t);
             System.out.println(" Done!");
             System.out.println("Found " + getNumber(ttl) + " records in " + elapsedTime);
             init();
         }
 
+        private void countRows(java.io.BufferedReader br, boolean skipHeader) throws Exception{
+            ttl = 0L;
+            if (skipHeader) br.readLine();
+            while (br.readLine()!=null){
+                ttl++;
+            }
+            br.close();
+        }
 
         private void init(){
             javaxt.utils.Date startDate = new javaxt.utils.Date();
             startDate.setTimeZone("America/New York");
             System.out.println("Starting ingest at " + startDate.toString("yyyy-MM-dd HH:mm a"));
             startTime = System.currentTimeMillis();
+            counter = new AtomicLong(0);
         }
 
         public void updateCount(){
-            if (x==0) System.out.print(statusText);
-            x++;
+            if (counter.get()==0) System.out.print(statusText);
+            long x = counter.incrementAndGet();
             double p = ((double) x/ (double) ttl);
             int currPercent = (int) Math.round(p*100);
             if (currPercent > percentComplete){

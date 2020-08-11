@@ -1,7 +1,9 @@
 package com.kartographia.gazetter.web;
+import javaxt.express.WebService;
+import javaxt.express.ServiceResponse;
+import javaxt.express.ServiceRequest;
 import com.kartographia.gazetter.*;
 import java.io.IOException;
-import javaxt.express.ws.*;
 import javaxt.http.servlet.*;
 import javaxt.io.Jar;
 import javaxt.sql.*;

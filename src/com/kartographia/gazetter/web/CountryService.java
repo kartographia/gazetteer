@@ -1,8 +1,8 @@
 package com.kartographia.gazetter.web;
 import com.kartographia.gazetter.*;
 
-import javaxt.express.ws.ServiceRequest;
-import javaxt.express.ws.ServiceResponse;
+import javaxt.express.ServiceRequest;
+import javaxt.express.ServiceResponse;
 import javaxt.http.servlet.HttpServletRequest;
 import javaxt.http.servlet.ServletException;
 
@@ -105,7 +105,7 @@ public class CountryService {
 
 
             if (filter.equals("names")){
-                return getNames(cc, database);
+                return getCountryNames(cc, database);
             }
             else if (filter.equals("extents")){
                 return getExtents(cc, database);
@@ -127,7 +127,7 @@ public class CountryService {
   //**************************************************************************
   //** getNames
   //**************************************************************************
-    private ServiceResponse getNames(String cc, Database database){
+    private ServiceResponse getCountryNames(String cc, Database database){
 
         String sql = "select gazetter.name.* " +
         "from gazetter.place " +

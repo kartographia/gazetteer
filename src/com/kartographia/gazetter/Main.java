@@ -1,10 +1,12 @@
 package com.kartographia.gazetter;
 import com.kartographia.gazetter.source.*;
 import com.kartographia.gazetter.web.WebApp;
-import javaxt.json.JSONObject;
-import javaxt.utils.Console;
-import javaxt.io.Jar;
+
+import javaxt.io.*;
 import javaxt.sql.*;
+import javaxt.json.JSONObject;
+import static javaxt.utils.Console.console;
+
 import java.util.*;
 
 
@@ -28,18 +30,18 @@ public class Main {
   /** Entry point for the application.
    */
     public static void main(String[] arr) throws Exception {
-        java.util.HashMap<String, String> args = Console.parseArgs(arr);
+        HashMap<String, String> args = console.parseArgs(arr);
 
 
       //Get jar file
         Jar jar = new Jar(Main.class);
-        javaxt.io.File jarFile = new javaxt.io.File(jar.getFile());
+        File jarFile = new File(jar.getFile());
 
 
       //Get config file
-        javaxt.io.File configFile = (args.containsKey("-config")) ?
+        File configFile = (args.containsKey("-config")) ?
             Config.getFile(args.get("-config"), jarFile) :
-            new javaxt.io.File(jar.getFile().getParentFile(), "config.json");
+            new File(jar.getFile().getParentFile(), "config.json");
 
         if (!configFile.exists()) {
             System.out.println("Could not find config file. Use the \"-config\" parameter to specify a path to a config");
@@ -69,8 +71,10 @@ public class Main {
       //Process command line args
         if (args.containsKey("-import")){
 
+            int numThreads = 12;
+            try{numThreads = Integer.parseInt(args.get("-t"));}catch(Exception e){}
 
-            javaxt.io.File file = new javaxt.io.File(args.get("-import"));
+            File file = new File(args.get("-import"));
             if (file.exists()){
 
                 if (file.getExtension().equals("shp")){
@@ -99,7 +103,7 @@ public class Main {
                             USGS.load(file, database);
                         }
                         else if (header.startsWith("RC\t")){
-                            NGA.load(file, database);
+                            NGA.load(file, numThreads, database);
                         }
                         else if (header.startsWith("USPS\t")){
                             USCensus.load(file, database);
@@ -123,11 +127,11 @@ public class Main {
                 if (source==null) throw new Exception("Source is required");
 
                 String path = args.get("-path");
-                file = new javaxt.io.File(path);
+                file = new File(path);
                 if (file.exists()){
 
                     if (source.equalsIgnoreCase("NGA")){
-                        NGA.load(file, database);
+                        NGA.load(file, numThreads, database);
                     }
                     else if (source.equalsIgnoreCase("USGS")){
                         USGS.load(file, database);
@@ -150,6 +154,23 @@ public class Main {
 
         }
         else if (args.containsKey("-download")){
+
+            String source = args.get("-download");
+            if (source==null) throw new Exception("Source is required");
+
+            Directory downloadDir = new Directory(Config.get("downloads").toString());
+            if (!downloadDir.exists()) downloadDir.create();
+            if (!downloadDir.exists()) throw new Exception("Invalid download directory specified in the config file");
+
+
+            int numThreads = 12;
+            try{numThreads = Integer.parseInt(args.get("-t"));}catch(Exception e){}
+
+            
+            if (source.equalsIgnoreCase("NGA")){
+                File file = NGA.download(downloadDir, false);
+                NGA.load(file, numThreads, database);
+            }
 
         }
         else if (args.containsKey("-update")){
@@ -183,7 +204,7 @@ public class Main {
   /** Used to update country names by adding records from the CountryNames
    *  dictionary developed for the TEX app.
    */
-    private static void updateCountryNames(javaxt.io.File file) throws Exception {
+    private static void updateCountryNames(File file) throws Exception {
 
 
       //Parse file and generate list of country names, grouped by country code

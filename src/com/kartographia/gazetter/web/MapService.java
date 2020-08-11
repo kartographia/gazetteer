@@ -2,9 +2,9 @@ package com.kartographia.gazetter.web;
 import com.kartographia.gazetter.*;
 
 //webservice includes
-import javaxt.express.ws.ServiceRequest;
-import javaxt.express.ws.ServiceResponse;
-import javaxt.express.ws.WebService;
+import javaxt.express.ServiceRequest;
+import javaxt.express.ServiceResponse;
+import javaxt.express.WebService;
 import javaxt.http.servlet.ServletException;
 
 //java includes
