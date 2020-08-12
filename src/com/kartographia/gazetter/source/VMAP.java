@@ -1,4 +1,5 @@
 package com.kartographia.gazetter.source;
+import com.kartographia.gazetter.utils.*;
 import com.kartographia.gazetter.*;
 import com.vividsolutions.jts.geom.*;
 import javaxt.json.JSONObject;
@@ -32,7 +33,7 @@ public class VMAP {
 
         ShapeFile shp = new ShapeFile(file.toFile());
         System.out.println("Found " + shp.getRecordCount() + " records in the shapefile");
-        Utils.Counter counter = new Utils.Counter(shp.getRecordCount());
+        Counter counter = new Counter(shp.getRecordCount());
 
         boolean isValidated = false;
 

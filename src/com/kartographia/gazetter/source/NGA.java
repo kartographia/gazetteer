@@ -1,6 +1,6 @@
 package com.kartographia.gazetter.source;
 import com.kartographia.gazetter.*;
-import com.kartographia.gazetter.source.Utils.*;
+import com.kartographia.gazetter.utils.*;
 import com.vividsolutions.jts.geom.*;
 
 //javaxt includes
@@ -19,6 +19,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.concurrent.ConcurrentHashMap;
 
 
 //******************************************************************************
@@ -37,10 +38,29 @@ import java.sql.SQLException;
 
 public class NGA {
 
+    private static Source source;
     private static String delimiter = "\t";
     //private DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
     private static PrecisionModel precisionModel = new PrecisionModel();
     private static GeometryFactory geometryFactory = new GeometryFactory(precisionModel, 4326);
+
+
+  //**************************************************************************
+  //** init
+  //**************************************************************************
+    private static void init(){
+        if (source==null);
+        try{
+            String name = "NGA";
+            source = Source.get("name=",name);
+            if (source==null){
+                source = new Source();
+                source.setName(name);
+                source.save();
+            }
+        }
+        catch(Exception e){}
+    }
 
 
   //**************************************************************************
@@ -56,17 +76,29 @@ public class NGA {
    *
    */
     public static void load(File file, int numThreads, Database database) throws Exception {
-        Source source = Source.get("name=","NGA");
+        init();
 
 
       //Get record count
         Counter counter = new Counter(getBufferedReader(file), true);
 
 
+      //Generate a list of ISO 639-3 language codes available in the jdk
+        String[] languages = Locale.getISOLanguages();
+        Map<String, Locale> localeMap = new HashMap<String, Locale>(languages.length);
+        for (String language : languages) {
+            Locale locale = new Locale(language);
+            String languageCode = locale.getISO3Language();
+            if (languageCode!=null) languageCode = languageCode.toLowerCase();
+            localeMap.put(languageCode, locale);
+        }
 
 
-      //Create threads to process records in the file
-        ThreadPool pool = new ThreadPool(numThreads){ //no limit?
+
+      //Get places and place names from the file
+        ConcurrentHashMap<String, Place> places = new ConcurrentHashMap<>();
+        ConcurrentHashMap<String, ArrayList<Name>> placeNames = new ConcurrentHashMap<>();
+        ThreadPool pool = new ThreadPool(numThreads){
             public void process(Object obj){
                 String row = (String) obj;
                 counter.updateCount();
@@ -80,6 +112,7 @@ public class NGA {
                 }
 
 
+                //https://geonames.nga.mil/gns/html/gis_countryfiles.html
 
 
               //Check whether to insert or skip the record
@@ -109,6 +142,8 @@ public class NGA {
                         languageCode = null;
                     }
                 }
+                Locale locale = localeMap.get(languageCode);
+                if (locale==null) locale = Locale.US;
 
 
                 int lastUpdate = cint(col[28].replace("-", "")); //2015-03-02 --> 20150302
@@ -208,22 +243,15 @@ public class NGA {
 
 
 
-                    try{
-                        place.save();
-                    }
-                    catch(Exception e){
-                        if (e instanceof IllegalStateException){
-                            return;
-                        }
-                        else{
-                            String msg = e.getMessage();
-                            if (msg.contains("duplicate key")){
-                                update(place);
-                            }
-                            else{
-                                console.log(e.getMessage());
-                            }
-                        }
+                    String key = source.getID() + "|" + id + "|" + cc; ////source_id=? and source_key=? and country_code=?
+                    HashMap<String, Place> places = getPlaces();
+                    if (!places.containsKey(key)) places.put(key, place);
+
+                    HashMap<String, ArrayList<Name>> map = getNames();
+                    ArrayList<Name> names = map.get(key);
+                    if (names==null){
+                        names = new ArrayList<>();
+                        map.put(key, names);
                     }
 
 
@@ -235,64 +263,149 @@ public class NGA {
                                               //This field also includes non-roman script based names which are stripped of vowel markings.
 
 
+
+
                     Name placeName = new Name();
                     placeName.setName(name);
+                    placeName.setUname(name.toUpperCase(locale));
                     placeName.setLanguageCode(languageCode);
                     placeName.setType(nameType);
                     placeName.setSource(source);
                     placeName.setSourceKey(id);
                     placeName.setSourceDate(lastUpdate);
-                    placeName.setPlace(place);
-                    try{
-                        placeName.save();
-                    }
-                    catch(Exception e){
-                        if (e instanceof IllegalStateException){
-                            return;
-                        }
-                        else{
-                            String msg = e.getMessage();
-                            if (msg.contains("duplicate key")){
-                                update(place);
-                            }
-                            else{
-                                console.log(e.getMessage());
-                            }
-                        }
-                    }
+                    names.add(placeName);
 
 
                     if (!name.equals(altName)){
                         placeName = new Name();
                         placeName.setName(altName);
+                        placeName.setUname(altName.toUpperCase(Locale.US));
                         placeName.setLanguageCode("eng");
                         placeName.setType(nameType);
                         placeName.setSource(source);
                         placeName.setSourceKey(id);
                         placeName.setSourceDate(lastUpdate);
-                        placeName.setPlace(place);
-                        try{
-                            placeName.save();
-                        }
-                        catch(Exception e){
-                            if (e instanceof IllegalStateException){
-                                return;
-                            }
-                            else{ //probably a duplicate
-                                String msg = e.getMessage();
-                                if (msg.contains("duplicate key")){
-                                    update(place);
-                                }
-                                else{
-                                    console.log(e.getMessage());
-                                }
-                            }
-                        }
+                        names.add(placeName);
                     }
-
-
                 }
             }
+
+
+
+            private HashMap<String, Place> getPlaces(){
+                HashMap<String, Place> places = (HashMap<String, Place>) get("places");
+                if (places==null){
+                    places = new HashMap<>();
+                    set("places", places);
+                }
+                return places;
+            }
+
+            private HashMap<String, ArrayList<Name>> getNames(){
+                HashMap<String, ArrayList<Name>> names = (HashMap<String, ArrayList<Name>>) get("names");
+                if (names==null){
+                    names = new HashMap<>();
+                    set("names", names);
+                }
+                return names;
+            }
+
+
+            public void exit(){
+                HashMap<String, Place> _places = getPlaces();
+                HashMap<String, ArrayList<Name>> _placeNames = getNames();
+                Iterator<String> it = _places.keySet().iterator();
+                while (it.hasNext()){
+                    String key = it.next();
+                    Place place = _places.get(key);
+                    ArrayList<Name> _names = _placeNames.get(key);
+
+                    synchronized(places){
+                        places.put(key, place);
+                    }
+
+                    synchronized(placeNames){
+                        ArrayList<Name> names = placeNames.get(key);
+                        if (names==null){
+                            names = new ArrayList<>();
+                            placeNames.put(key, names);
+                        }
+                        for (Name name : _names){
+                            names.add(name);
+                        }
+                    }
+                }
+            }
+        }.start();
+
+
+      //Parse file
+        BufferedReader br = getBufferedReader(file);
+        br.readLine(); //Skip header
+        String row;
+        while ((row = br.readLine()) != null){
+            pool.add(row);
+        }
+        br.close();
+
+        pool.done();
+        pool.join();
+
+
+        System.out.println("\nFound " + StringUtils.format(places.size()) + " unique places");
+
+
+        Counter x = new Counter(places.size());
+        pool = new ThreadPool(5, 10000){
+            public void process(Object obj){
+                Object[] arr = (Object[]) obj;
+                Place place = (Place) arr[0];
+                ArrayList<Name> names = (ArrayList<Name>) arr[1];
+                x.updateCount();
+
+
+
+                try{
+                    place.save();
+                }
+                catch(Exception e){
+                    if (e instanceof IllegalStateException){
+                        clear();
+                        return;
+                    }
+                    else{
+                        String msg = e.getMessage();
+                        if (msg.contains("duplicate key")){
+                            update(place);
+                        }
+                        else{
+                            console.log(e.getMessage());
+                        }
+                    }
+                }
+
+
+                for (Name name : names){
+                    try{
+                        Recordset rs = getRecordset(place, name);
+                        if (rs.EOF) rs.addNew();
+                        rs.setValue("name", name.getName());
+                        rs.setValue("uname", name.getUname());
+                        rs.setValue("type", name.getType());
+                        rs.setValue("language_code", name.getLanguageCode());
+                        rs.setValue("place_id", place.getID());
+                        rs.setValue("source_id", source.getID());
+                        rs.setValue("source_key", name.getSourceKey());
+                        rs.setValue("source_date", name.getSourceDate());
+                        rs.update();
+                        rs.close();
+                    }
+                    catch(Exception e){
+                        console.log(e.getMessage());
+                    }
+                }
+            }
+
 
             private void update(Place place){
                 try{
@@ -340,25 +453,62 @@ public class NGA {
                 return stmt;
             }
 
+
+
+            private Recordset getRecordset(Place place, Name name) throws Exception {
+                Connection conn = (Connection) get("c2");
+                if (conn==null){
+                    conn = database.getConnection();
+                    set("c2", conn);
+                }
+
+
+                Recordset rs = (Recordset) get("rs");
+                if (rs==null){
+                    rs = new Recordset();
+                    set("rs", rs);
+                }
+
+
+                rs.open("select * from gazetter.name where place_id=" + place.getID() +
+                " and uname='" + name.getUname().replace("'", "''") + "'", conn, false);
+
+                return rs;
+            }
+
             public void exit(){
                 PreparedStatement stmt = (PreparedStatement) get("stmt");
                 if (stmt!=null) try{stmt.close();}catch(Exception e){}
 
                 Connection conn = (Connection) get("conn");
                 if (conn!=null) conn.close();
+
+                Recordset rs = (Recordset) get("rs");
+                if (rs!=null) rs.close();
+
+                conn = (Connection) get("c2");
+                if (conn!=null) conn.close();
+            }
+
+            private void clear(){
+                List list = getQueue();
+                synchronized(list){
+                    list.clear();
+                    done();
+                }
             }
 
         }.start();
 
 
-      //Parse file
-        BufferedReader br = getBufferedReader(file);
-        br.readLine(); //Skip header
-        String row;
-        while ((row = br.readLine()) != null){
-            pool.add(row);
+
+        Iterator<String> it = places.keySet().iterator();
+        while (it.hasNext()){
+            String key = it.next();
+            Place place = places.get(key);
+            ArrayList<Name> names = placeNames.remove(key);
+            pool.add(new Object[]{place, names});
         }
-        br.close();
 
         pool.done();
         pool.join();
@@ -468,8 +618,8 @@ public class NGA {
         JSONArray arr = new JSONArray();
 
 
-        Source source = Source.get("name=","NGA");
-        LinkedHashMap<String, Integer> recentUpdates = Utils.getRecentUpdates(source, database);
+
+        LinkedHashMap<String, Integer> recentUpdates = DbUtils.getRecentUpdates(source, database);
 
 
 
@@ -853,13 +1003,6 @@ public class NGA {
         typeMap.put("MFGM", new String[]{"military", "munitions plant"});
         typeMap.put("MILB", new String[]{"military", "military base"});
         typeMap.put("SCHM", new String[]{"military", "military school"});
-        typeMap.put("CMP", new String[]{"populated place", "camp(s)"});
-        typeMap.put("CMPL", new String[]{"populated place", "logging camp"});
-        typeMap.put("CMPLA", new String[]{"populated place", "labor camp"});
-        typeMap.put("CMPMN", new String[]{"populated place", "mining camp"});
-        typeMap.put("CMPO", new String[]{"populated place", "oil camp"});
-        typeMap.put("CMPQ", new String[]{"populated place", "abandoned camp"});
-        typeMap.put("CMPRF", new String[]{"populated place", "refugee camp"});
         typeMap.put("MSQE", new String[]{"religious", "mosque"});
         typeMap.put("MSSN", new String[]{"religious", "mission"});
         typeMap.put("MSSNQ", new String[]{"religious", "abandoned mission"});
@@ -878,26 +1021,33 @@ public class NGA {
         typeMap.put("TMB", new String[]{"religious", "tomb(s)"});
         typeMap.put("TMPL", new String[]{"religious", "temple(s)"});
         typeMap.put("GHAT", new String[]{"religious", "ghāt"});
-        typeMap.put("PPL", new String[]{"residential", "populated place"});
-        typeMap.put("PPLA", new String[]{"residential", "seat of a first-order administrative division"});
-        typeMap.put("PPLC", new String[]{"residential", "capital of a political entity"});
-        typeMap.put("PPLL", new String[]{"residential", "populated locality"});
-        typeMap.put("PPLQ", new String[]{"residential", "abandoned populated place"});
-        typeMap.put("PPLS", new String[]{"residential", "populated places"});
-        typeMap.put("PPLW", new String[]{"residential", "destroyed populated place"});
-        typeMap.put("PPLX", new String[]{"residential", "section of populated place"});
-        typeMap.put("DEVH", new String[]{"residential", "housing development"});
-        typeMap.put("HSE", new String[]{"residential", "house(s)"});
-        typeMap.put("HSEC", new String[]{"residential", "country house"});
-        typeMap.put("HUT", new String[]{"residential", "hut"});
-        typeMap.put("HUTS", new String[]{"residential", "huts"});
-        typeMap.put("LEPC", new String[]{"residential", "leper colony"});
-        typeMap.put("STLMT", new String[]{"residential", "Israeli settlement"});
-        typeMap.put("PPLA2", new String[]{"residential", "seat of a second-order administrative division"});
-        typeMap.put("PPLA3", new String[]{"residential", "seat of a third-order administrative division"});
-        typeMap.put("PPLA4", new String[]{"residential", "seat of a fourth-order administrative division"});
-        typeMap.put("BLDA", new String[]{"residential", "apartment building"});
-        typeMap.put("PPLF", new String[]{"residential", "farm village"});
+        typeMap.put("PPL", new String[]{"populated place", "populated place"});
+        typeMap.put("PPLA", new String[]{"populated place", "seat of a first-order administrative division"});
+        typeMap.put("PPLC", new String[]{"populated place", "capital of a political entity"});
+        typeMap.put("PPLL", new String[]{"populated place", "populated locality"});
+        typeMap.put("PPLQ", new String[]{"populated place", "abandoned populated place"});
+        typeMap.put("PPLS", new String[]{"populated place", "populated places"});
+        typeMap.put("PPLW", new String[]{"populated place", "destroyed populated place"});
+        typeMap.put("PPLX", new String[]{"populated place", "section of populated place"});
+        typeMap.put("DEVH", new String[]{"populated place", "housing development"});
+        typeMap.put("HSE", new String[]{"populated place", "house(s)"});
+        typeMap.put("HSEC", new String[]{"populated place", "country house"});
+        typeMap.put("HUT", new String[]{"populated place", "hut"});
+        typeMap.put("HUTS", new String[]{"populated place", "huts"});
+        typeMap.put("LEPC", new String[]{"populated place", "leper colony"});
+        typeMap.put("STLMT", new String[]{"populated place", "Israeli settlement"});
+        typeMap.put("PPLA2", new String[]{"populated place", "seat of a second-order administrative division"});
+        typeMap.put("PPLA3", new String[]{"populated place", "seat of a third-order administrative division"});
+        typeMap.put("PPLA4", new String[]{"populated place", "seat of a fourth-order administrative division"});
+        typeMap.put("CMP", new String[]{"populated place", "camp(s)"});
+        typeMap.put("CMPL", new String[]{"populated place", "logging camp"});
+        typeMap.put("CMPLA", new String[]{"populated place", "labor camp"});
+        typeMap.put("CMPMN", new String[]{"populated place", "mining camp"});
+        typeMap.put("CMPO", new String[]{"populated place", "oil camp"});
+        typeMap.put("CMPQ", new String[]{"populated place", "abandoned camp"});
+        typeMap.put("CMPRF", new String[]{"populated place", "refugee camp"});
+        typeMap.put("BLDA", new String[]{"populated place", "apartment building"});
+        typeMap.put("PPLF", new String[]{"populated place", "farm village"});
         typeMap.put("PIER", new String[]{"transportation", "pier"});
         typeMap.put("PKLT", new String[]{"transportation", "parking lot"});
         typeMap.put("PRT", new String[]{"transportation", "port"});

@@ -1,4 +1,5 @@
 package com.kartographia.gazetter;
+import com.kartographia.gazetter.utils.*;
 import com.kartographia.gazetter.source.*;
 import com.kartographia.gazetter.web.WebApp;
 
@@ -113,7 +114,7 @@ public class Main {
                         }
 
                         System.out.println();
-                        System.out.println("Ellapsed Time: " + Utils.getElapsedTime(startTime));
+                        System.out.println("Ellapsed Time: " + StringUtils.getElapsedTime(startTime));
                     }
                     catch(Exception e){
                         try{ br.close(); } catch(Exception ex){}
@@ -145,7 +146,9 @@ public class Main {
                     else if (source.equalsIgnoreCase("VLIZ")){
                         VLIZ.load(file, database);
                     }
-
+                    else if (source.equalsIgnoreCase("NaturalEarth")){
+                        NaturalEarth.load(file, database);
+                    }
                 }
                 else{
                     throw new Exception("Path is required");
@@ -174,6 +177,10 @@ public class Main {
             else if (source.equalsIgnoreCase("USGS")){
                 File file = USGS.download(downloadDir, false);
                 USGS.load(file, numThreads, database);
+            }
+            else if (source.equalsIgnoreCase("NaturalEarth")){
+                File file = NaturalEarth.download(downloadDir, false);
+                NaturalEarth.load(file, database);
             }
 
         }

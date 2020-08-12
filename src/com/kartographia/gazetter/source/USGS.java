@@ -1,6 +1,6 @@
 package com.kartographia.gazetter.source;
 import com.kartographia.gazetter.*;
-import com.kartographia.gazetter.source.Utils.*;
+import com.kartographia.gazetter.utils.*;
 import com.vividsolutions.jts.geom.*;
 
 //javaxt includes
@@ -34,6 +34,7 @@ import java.sql.PreparedStatement;
 
 public class USGS {
 
+    private static Source source;
     private static String delimiter = "\\|";
     private static int washingtonDC = 531871;
     private static int[] stateCapitals = new int[]{
@@ -49,6 +50,25 @@ public class USGS {
     private static GeometryFactory geometryFactory = new GeometryFactory(precisionModel, 4326);
 
 
+
+  //**************************************************************************
+  //** init
+  //**************************************************************************
+    private static void init(){
+        if (source==null);
+        try{
+            String name = "USGS";
+            source = Source.get("name=",name);
+            if (source==null){
+                source = new Source();
+                source.setName(name);
+                source.save();
+            }
+        }
+        catch(Exception e){}
+    }
+
+
   //**************************************************************************
   //** load
   //**************************************************************************
@@ -57,8 +77,8 @@ public class USGS {
    *  http://geonames.usgs.gov/docs/stategaz/POP_PLACES_20161001.zip
    */
     public static void load(File file, int numThreads, Database database) throws Exception {
-        Source source = Source.get("name=","USGS");
-
+        init();
+        
 
       //Get record count
         Counter counter = new Counter(getBufferedReader(file), true);
@@ -140,6 +160,7 @@ public class USGS {
                 }
                 catch(Exception e){
                     if (e instanceof IllegalStateException){
+                        clear();
                         return;
                     }
                     else{
@@ -161,7 +182,7 @@ public class USGS {
                 }
                 catch(Exception e){
                     if (e instanceof IllegalStateException){
-                        return;
+                        clear();
                     }
                     else{
                         String msg = e.getMessage();
@@ -228,6 +249,14 @@ public class USGS {
 
                 Connection conn = (Connection) get("conn");
                 if (conn!=null) conn.close();
+            }
+
+            private void clear(){
+                List list = getQueue();
+                synchronized(list){
+                    list.clear();
+                    done();
+                }
             }
 
         }.start();

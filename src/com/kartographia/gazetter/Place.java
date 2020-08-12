@@ -3,7 +3,6 @@ import javaxt.json.*;
 import java.sql.SQLException;
 import com.vividsolutions.jts.geom.Geometry;
 import com.vividsolutions.jts.io.WKTReader;
-import javaxt.utils.Date;
 
 //******************************************************************************
 //**  Place Class
@@ -26,7 +25,6 @@ public class Place extends javaxt.sql.Model {
     private Long sourceKey;
     private Integer sourceDate;
     private JSONObject info;
-    private Date lastModified;
 
 
   //**************************************************************************
@@ -46,7 +44,6 @@ public class Place extends javaxt.sql.Model {
             put("sourceKey", "source_key");
             put("sourceDate", "source_date");
             put("info", "info");
-            put("lastModified", "last_modified");
 
         }});
         
@@ -96,7 +93,6 @@ public class Place extends javaxt.sql.Model {
             this.sourceKey = getValue(rs, "source_key").toLong();
             this.sourceDate = getValue(rs, "source_date").toInteger();
             this.info = new JSONObject(getValue(rs, "info").toString());
-            this.lastModified = getValue(rs, "last_modified").toDate();
 
 
 
@@ -142,7 +138,6 @@ public class Place extends javaxt.sql.Model {
         this.sourceKey = json.get("sourceKey").toLong();
         this.sourceDate = json.get("sourceDate").toInteger();
         this.info = json.get("info").toJSONObject();
-        this.lastModified = json.get("lastModified").toDate();
     }
 
 
@@ -232,10 +227,6 @@ public class Place extends javaxt.sql.Model {
 
     public void setInfo(JSONObject info){
         this.info = info;
-    }
-
-    public Date getLastModified(){
-        return lastModified;
     }
     
     

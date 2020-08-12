@@ -1,5 +1,5 @@
 package com.kartographia.gazetter.source;
-import com.kartographia.gazetter.source.Utils.*;
+import com.kartographia.gazetter.utils.*;
 import com.kartographia.gazetter.*;
 import javaxt.json.*;
 import javaxt.sql.*;
@@ -46,7 +46,7 @@ public class USCensus {
 
       //Log edit
         Edit edit = new Edit();
-        edit.setStartDate(Utils.getDate(database));
+        edit.setStartDate(DbUtils.getDate(database));
         edit.setSummary("Update population and rank of US cities using 2010 Census data");
         edit.save();
 
@@ -188,7 +188,7 @@ public class USCensus {
 
 
       //Update edit log
-        edit.setEndDate(Utils.getDate(database));
+        edit.setEndDate(DbUtils.getDate(database));
         edit.save();
     }
 

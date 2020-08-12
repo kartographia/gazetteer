@@ -39,14 +39,14 @@ var models = {
             {name: 'source',        type: 'Source'},
             {name: 'sourceKey',     type: 'long'},
             {name: 'sourceDate',    type: 'int'}, //YYYYMMDD in utc
-            {name: 'info',          type: 'json'},
-            {name: 'lastModified',  type: 'date'}
+            {name: 'info',          type: 'json'}
+            //{name: 'lastModified',  type: 'date'}
         ],
         constraints: [
             {name: 'countryCode',   required: true,  length: 2},
             {name: 'admin1',        length: 2},
             {name: 'geom',          required: true},
-            {name: 'source',        required: true}
+            {name: 'source',        required: true,  onDelete: 'cascade'}
         ]
     },
 
@@ -67,15 +67,16 @@ var models = {
             {name: 'sourceKey',     type: 'long'},
             {name: 'sourceDate',    type: 'int'}, //YYYYMMDD in utc
 
-            {name: 'info',          type: 'json'},
-            {name: 'lastModified',  type: 'date'}
+            {name: 'info',          type: 'json'}
+            //{name: 'lastModified',  type: 'date'}
         ],
         constraints: [
             {name: 'name',          required: true},
+            {name: 'uname',         required: true},
             {name: 'languageCode',  length: 3},
             {name: 'type',          required: true},
-            {name: 'place',         required: true},
-            {name: 'source',        required: true}
+            {name: 'place',         required: true,  onDelete: 'cascade'},
+            {name: 'source',        required: true,  onDelete: 'cascade'}
         ]
     },
 
@@ -114,7 +115,7 @@ var models = {
             {name: 'lastModified',  type: 'date'}
         ],
         constraints: [
-            {name: 'place',         required: true},
+            {name: 'place',         required: true,  onDelete: 'cascade'},
             {name: 'info',          required: true},
             {name: 'status',        required: true, length: 10}
         ]

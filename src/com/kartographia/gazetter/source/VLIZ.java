@@ -1,4 +1,5 @@
 package com.kartographia.gazetter.source;
+import com.kartographia.gazetter.utils.*;
 import com.kartographia.gazetter.*;
 import com.vividsolutions.jts.geom.*;
 import javaxt.json.JSONObject;
@@ -19,6 +20,21 @@ import openmap.*;
 public class VLIZ {
 
 
+    private static Source source;
+    static {
+        try{
+            String name = "VLIZ";
+            source = Source.get("name=",name);
+            if (source==null){
+                source = new Source();
+                source.setName(name);
+                source.save();
+            }
+        }
+        catch(Exception e){}
+    }
+
+
   //**************************************************************************
   //** load
   //**************************************************************************
@@ -29,12 +45,11 @@ public class VLIZ {
    *  @param file World_Seas_IHO_v3.shp
    */
     public static void load(javaxt.io.File file, Database database) throws Exception {
-        Source source = Source.get("name=","VLIZ");
 
 
         ShapeFile shp = new ShapeFile(file.toFile());
         System.out.println("Found " + shp.getRecordCount() + " records in the shapefile");
-        Utils.Counter counter = new Utils.Counter(shp.getRecordCount());
+        Counter counter = new Counter(shp.getRecordCount());
 
         boolean isValidated = false;
 
@@ -79,7 +94,7 @@ public class VLIZ {
             placeName.setLanguageCode("eng");
             placeName.setType(2); //2=formal
             placeName.setSource(source);
-            
+
 
             placeName.setPlace(place);
             placeName.save();
