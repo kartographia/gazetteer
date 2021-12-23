@@ -78,7 +78,7 @@ public class USGS {
    */
     public static void load(File file, int numThreads, Database database) throws Exception {
         init();
-        
+
 
       //Get record count
         Counter counter = new Counter(getBufferedReader(file), true);
@@ -115,7 +115,7 @@ public class USGS {
                 );
 
                 Integer rank = getRank(id);
-                if (!type.equals("residential")) rank = null;
+                if (!type.equals("populated place")) rank = null;
 
                 if (name.endsWith("(historical)")){
                     name = name.substring(0, name.length()-"(historical)".length()).trim();
@@ -141,16 +141,7 @@ public class USGS {
               //Update
                 updateUSTerritories(place);
                 name = updateBuildings(name, place);
-
-
-              //Add name
-                Name placeName = new Name();
-                placeName.setName(name);
-                placeName.setLanguageCode("eng");
-                placeName.setType(2);
-                placeName.setSource(source);
-                placeName.setSourceKey(id);
-                placeName.setSourceDate(lastUpdate);
+                String uname = name.toUpperCase(Locale.US);
 
 
 
@@ -177,23 +168,23 @@ public class USGS {
 
               //Save name
                 try{
-                    placeName.setPlace(place);
-                    placeName.save();
+                    Recordset rs = getRecordset(place, uname);
+                    if (rs.EOF) rs.addNew();
+                    rs.setValue("name", name);
+                    rs.setValue("uname", uname);
+                    rs.setValue("type", 2);
+                    rs.setValue("language_code", "eng");
+                    rs.setValue("place_id", place.getID());
+                    rs.setValue("source_id", source.getID());
+                    rs.setValue("source_key", id);
+                    rs.setValue("source_date", lastUpdate);
+                    rs.update();
+                    rs.close();
                 }
                 catch(Exception e){
-                    if (e instanceof IllegalStateException){
-                        clear();
-                    }
-                    else{
-                        String msg = e.getMessage();
-                        if (msg.contains("duplicate key")){
-
-                        }
-                        else{
-                            console.log(e.getMessage());
-                        }
-                    }
+                    console.log(e.getMessage());
                 }
+
             }
 
 
@@ -243,11 +234,39 @@ public class USGS {
                 return stmt;
             }
 
+
+            private Recordset getRecordset(Place place, String uname) throws Exception {
+                Connection conn = (Connection) get("c2");
+                if (conn==null){
+                    conn = database.getConnection();
+                    set("c2", conn);
+                }
+
+
+                Recordset rs = (Recordset) get("rs");
+                if (rs==null){
+                    rs = new Recordset();
+                    set("rs", rs);
+                }
+
+
+                rs.open("select * from gazetter.name where place_id=" + place.getID() +
+                " and uname='" + uname.replace("'", "''") + "'", conn, false);
+
+                return rs;
+            }
+
             public void exit(){
                 PreparedStatement stmt = (PreparedStatement) get("stmt");
                 if (stmt!=null) try{stmt.close();}catch(Exception e){}
 
                 Connection conn = (Connection) get("conn");
+                if (conn!=null) conn.close();
+
+                Recordset rs = (Recordset) get("rs");
+                if (rs!=null) rs.close();
+
+                conn = (Connection) get("c2");
                 if (conn!=null) conn.close();
             }
 
@@ -286,7 +305,8 @@ public class USGS {
   /** Used to download the "National File" from the USGS website
    */
     public static File download(Directory downloadDir, boolean unzip) throws Exception {
-        java.net.URL url = new java.net.URL("https://www.usgs.gov/core-science-systems/ngp/board-on-geographic-names/download-gnis-data");
+        java.net.URL url = new java.net.URL(
+        "https://www.usgs.gov/core-science-systems/ngp/board-on-geographic-names/download-gnis-data");
         javaxt.http.Response response = new javaxt.http.Request(url).getResponse();
         if (response.getStatus()!=200) throw new Exception("Failed to connect to " + url);
         String html = response.getText();
@@ -580,7 +600,7 @@ public class USGS {
         typeMap.put("Mine", "industry");
         typeMap.put("Oilfield", "industry");
         typeMap.put("Park", "amenity");
-        typeMap.put("Populated Place", "residential");
+        typeMap.put("Populated Place", "populated place");
         typeMap.put("Post Office", "amenity");
         typeMap.put("School", "education");
         typeMap.put("Tower", "infrastructure");

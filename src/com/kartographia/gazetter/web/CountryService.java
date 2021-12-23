@@ -8,12 +8,9 @@ import javaxt.http.servlet.ServletException;
 
 import javaxt.json.*;
 import javaxt.sql.*;
-import javaxt.utils.Console;
 import javaxt.express.utils.StringUtils;
 
 public class CountryService {
-
-    private Console console = new Console();
 
 
   //**************************************************************************
@@ -50,10 +47,7 @@ public class CountryService {
       //Build with statement
         "with vars as (select name, country_code, min(name.type) as type " +
         "from gazetter.place " +
-        "inner join gazetter.place_name " +
-        "   on place_name.place_id=place.id " +
-        "inner join gazetter.name " +
-        "   on place_name.name_id=name.id " +
+        "join gazetter.name on place.id=name.place_id " +
         "where place.type='boundary' and place.subtype='country' " +
         "group by country_code, name order by country_code, type, name) " +
 
@@ -131,10 +125,7 @@ public class CountryService {
 
         String sql = "select gazetter.name.* " +
         "from gazetter.place " +
-        "inner join gazetter.place_name " +
-        "   on place_name.place_id=place.id " +
-        "inner join gazetter.name " +
-        "   on place_name.name_id=name.id " +
+        "join gazetter.name on place.id=name.place_id " +
         "where place.country_code='" + cc.toUpperCase() +
             "' and place.type='boundary' and place.subtype='country'";
 

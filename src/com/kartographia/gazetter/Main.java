@@ -50,27 +50,16 @@ public class Main {
         }
 
 
-      //Read config file (json)
-        JSONObject config = new JSONObject(configFile.getText());
-
-
-      //Update relative paths to schema
-        JSONObject schema = config.get("schema").toJSONObject();
-        JSONObject gazetteer = schema.get("gazetter").toJSONObject();
-        Config.updateFile("path", gazetteer, configFile);
-        Config.updateFile("updates", gazetteer, configFile);
-        schema.set("gazetter", gazetteer);
-
-
       //Initialize config
-        Config.init(config, jar);
-        Database database = Config.getDatabase();
+        Config.load(configFile, jar);
 
 
 
 
       //Process command line args
         if (args.containsKey("-import")){
+            Config.initDatabase();
+            Database database = Config.getDatabase();
 
             int numThreads = 12;
             try{numThreads = Integer.parseInt(args.get("-t"));}catch(Exception e){}
@@ -157,6 +146,8 @@ public class Main {
 
         }
         else if (args.containsKey("-download")){
+            Config.initDatabase();
+            Database database = Config.getDatabase();
 
             String source = args.get("-download");
             if (source==null) throw new Exception("Source is required");
@@ -188,17 +179,15 @@ public class Main {
 
         }
         else{
+            Config.initDatabase();
+            Database database = Config.getDatabase();
             try{
-                if (!config.has("webserver")){
+                if (!Config.has("webserver")){
                     throw new Exception("Config file is missing \"webserver\" config information");
                 }
                 else{
-                    JSONObject webConfig = config.get("webserver").toJSONObject();
-                    Config.updateDir("webDir", webConfig, configFile);
-                    Config.updateDir("logDir", webConfig, configFile);
-                    Config.updateFile("keystore", webConfig, configFile);
-
-                    new WebApp(config.get("webserver").toJSONObject(), database);
+                    JSONObject webConfig = Config.get("webserver").toJSONObject();
+                    new WebApp(webConfig, database);
                     //SyncService.start();
                 }
             }
