@@ -1,0 +1,516 @@
+SOUTH GEORGIA AND THE SOUTH SANDWICH ISLANDS;SX
+French Southern and French Antarctic Lands;FS
+SOUTH GEORGIA AND SOUTH SANDWICH ISLANDS;SX
+UNITED STATES MINOR OUTLYING ISLANDS;US
+FORMER YUGOSLAV REPUBLIC OF MACEDONIA;MK
+DEMOCRATIC PEOPLE'S REPUBLIC OF KOREA;KN
+DEMOCRATIC PEOPLES REPUBLIC OF KOREA;KN
+FRENCH SOUTHERN AND ANTARCTIC LANDS;FS
+HEARD ISLAND AND MCDONALD ISLANDS;HM
+Falkland Islands (Islas Malvinas);FK
+Falkland Islands (Malvinas);FK
+Saint Vincent and the Grenadines;VC
+LAO PEOPLE'S DEMOCRATIC REPUBLIC;LA
+DEMOCRATIC REPUBLIC OF THE CONGO;CG
+Congo, Democratic Republic of the;CG
+LAO PEOPLES DEMOCRATIC REPUBLIC;LA
+OCCUPIED PALESTINIAN TERRITORY;PT
+St. Vincent and the Grenadines;VC
+FEDERATED STATES OF MICRONESIA;FM
+British Indian Ocean Territory;IO
+St. Vincent & the Grenadines;VC
+FRENCH SOUTHERN TERRITORIES;FS
+ASHMORE AND CARTIER ISLANDS;AT
+Saint Pierre and Miquelon;SB
+Turks and Caicos Islands;TK
+Northern Mariana Islands;CQ
+ISLAMIC REPUBLIC OF IRAN;IR
+Central African Republic;CT
+United States of America;US
+St. Pierre and Miquelon;SB
+COCOS (KEELING) ISLANDS;CK
+Holy See (Vatican City);VT
+Republic of South Sudan;OD
+Republic of Kazakhstan;KZ
+LIBYAN ARAB JAMAHIRIYA;LY
+British Virgin Islands;VI
+Turks & Caicos Islands;TK
+Bosnia and Herzegovina;BK
+Republic of Cabo Verde;CV
+DEM. REP. OF THE CONGO;CG
+Congo-Kinshasa;CG
+DR Congo;CG
+St. Pierre & Miquelon;SB
+Sao Tome and Principe;TP
+São Tomé and Príncipe;TP
+Saint Kitts and Nevis;SC
+Republic of the Congo;CF
+Congo-Brazzaville;CF
+Congo Republic;CF
+Republic of the Sudan;SU
+United Arab Emirates;AE
+Turks and Caicos Is.;TK
+SYRIAN ARAB REPUBLIC;SY
+Northern Mariana Is.;CQ
+Netherlands Antilles;NT
+Bosnia & Herzegovina;BK
+U.S. VIRGIN ISLANDS;VI
+Trinidad and Tobago;TD
+St. Kitts and Nevis;SC
+Sao Tome & Principe;TP
+REPUBLIC OF MOLDOVA;MD
+Juan de Nova Island;JU
+Antigua and Barbuda;AC
+Turks & Caicos Is.;TK
+Russian Federation;RS
+Dominican Republic;DR
+British Virgin Is.;VI
+Wallis and Futuna;WF
+#UNDERSEA FEATURES;UF
+Trinidad & Tobago;TD
+St. Kitts & Nevis;SC
+US VIRGIN ISLANDS;VI
+REPUBLIC OF KOREA;KS
+Republic of Congo;CF
+Equatorial Guinea;EK
+Coral Sea Islands Territory;CR
+CORAL SEA ISLANDS;CR
+Clipperton Island;IP
+BRUNEI DARUSSALAM;BX
+Antigua & Barbuda;AC
+South Sandwich Is;SX
+South Georgia Is;SX
+Pitcairn Islands;PC
+Papua New Guinea;PP
+Marshall Islands;RM
+Glorioso Islands;GO
+French Polynesia;FP
+Falkland Islands;FK
+Christmas Island;KT
+Kalaallit Nunaat;GL
+Wallis & Futuna;WF
+Tromelin Island;TE
+Spratly Islands;PG
+Solomon Islands;BP
+Paracel Islands;PF
+Kyrgyz Republic;KG
+KEELING ISLANDS;CK
+Bassas da India;BS
+Slovak Republic;LO
+Western Sahara;WI
+Virgin Islands;VQ
+United Kingdom;UK
+Norfolk Island;NF
+ISLAS MALVINAS;FK
+Czech Republic;EZ
+Cayman Islands;CJ
+American Samoa;AQ
+United States;US
+Saint Vincent;VC
+New Caledonia;NC
+Liechtenstein;LS
+Guinea-Bissau;PU
+French Guiana;FG
+Faroe Islands;FO
+Europa Island;EU
+Côte d'Ivoire;IV
+Cote d'Ivoire;IV
+Cocos Islands;CK
+BOUVET ISLAND;BV
+VATICAN CITY;VT
+Turkmenistan;TX
+South Africa;SF
+Sierra Leone;SL
+Saudi Arabia;SA
+SAINT HELENA;SH
+Saint Helena;SH
+Pitcairn Is.;PC
+Marshall Is.;RM
+Falkland Is.;FK
+CTE D'IVOIRE;IV
+Cook Islands;CW
+Christmas I.;KT
+Burkina Faso;UV
+South Sudan;OD
+TIMOR-LESTE;TT
+Timor Leste;TT
+Switzerland;SZ
+St. Vincent;VC
+South Korea;KS
+Solomon Is.;BP
+SAINT LUCIA;ST
+Saint Lucia;ST
+Puerto Rico;RQ
+Palestinian;PT
+North Korea;KN
+New Zealand;NZ
+Netherlands;NL
+Kirghizstan;KG
+Ivory Coast;IV
+Isle of Man;IM
+Herzegovina;BK
+Hercegovina;BK
+El Salvador;ES
+Afghanistan;AF
+The Bahamas;BF
+Philippines;RP
+Brazzaville;CF
+Lao P.D.R.;LA
+Yugoslavia;YI
+Virgin Is.;VQ
+Uzbekistan;UZ
+Tajikistan;TI
+St. Helena;SH
+Seychelles;SE
+San Marino;SM
+Portuguese;PO
+Philippine;RP
+Norfolk I.;NF
+Mozambique;MZ
+Mozambican;MZ
+Montserrat;MH
+Montenegro;MJ
+Micronesia;FM
+Mauritania;MR
+Martinique;MB
+Madagascar;MA
+Madagascan;MA
+Luxembourg;LU
+Kyrgyzstan;KG
+Kirgizstan;KG
+Kazakhstan;KZ
+Guadeloupe;GP
+Grenadines;VC
+Gaza Strip;PT
+EAST TIMOR;TT
+Costa Rica;CS
+Cayman Is.;CJ
+Cape Verde;CV
+Cabo Verde;CV
+Bangladesh;BG
+Azerbaijan;AJ
+ANTARCTICA;AY
+The Gambia;GA
+West Bank;PT
+Venezuela;VE
+Ukrainian;UP
+Turkmenia;TX
+Swaziland;WZ
+St. Lucia;ST
+Sri Lanka;CE
+Singapore;SN
+S. Africa;SF
+Palestine;PT
+Norwegian;NO
+Nicaragua;NU
+Morroccan;MO
+Mauritius;MP
+Macedonia;MK
+Lithuania;LH
+Kirghizia;KG
+Kazakstan;KZ
+Jan Mayen;JN
+Indonesia;ID
+HONG KONG;HK
+Guatemala;GT
+Greenland;GL
+Gibraltar;GI
+Faroe Is.;FO
+Falklands;FK
+"DRC Congo";CG
+Cocos Is.;CK
+Australia;AS
+Argentina;AR
+Zimbabwe;ZI
+Yugoslav;YI
+VIET NAM;VM
+Turkomen;TX
+Trinidad;TD
+Thailand;TH
+Tanzania;TZ
+Svalbard;SV
+Suriname;NS
+Sudanese;SU
+Spaniard;SP
+Slovenia;SI
+Slovakia;LO
+Scotland;UK
+S. Korea;KS
+S Africa;SF
+PITCAIRN;PC
+Portugal;PO
+Paraguay;PA
+Pakistan;PK
+Norweign;NO
+N. Korea;KN
+Mongolia;MG
+Mexicans;MX
+Malvinas;FK
+MALDIVES;MV
+Malaysia;MY
+Lebanese;LE
+Kiribati;KR
+Kirgizia;KG
+Ivorians;IV
+Honduras;HO
+HOLY SEE;VT
+Guernsey;GK
+Filipino;RP
+Ethiopia;ET
+Dhekelia;DX
+Dominica;DO
+Djibouti;DJ
+Cook Is.;CW
+Colombia;CO
+Canadian;CA
+Cameroon;CM
+Cambodia;CB
+Bulgaria;BU
+Botswana;BC
+Barbados;BB
+Anguilla;AV
+Akrotiri;AX
+Eswatini;WZ
+W. Bank;PT
+Vietnam;VM
+VATICAN;VT
+Vanuatu;NH
+Uruguay;UY
+Ukraine;UP
+Turkmen;TX
+Turkish;TU
+Türkiye;TU
+Tunisia;TS
+Tokelau;TL
+Swedish;SW
+Spanish;SP
+Somalia;SO
+Senegal;SG
+S Korea;KS
+Romania;RO
+Reunion;RE
+Reunion Island;RE
+Réunion Island; RE
+Nigeria;NI
+Namibia;WA
+N Korea;KN
+Myanmar;BM
+Morocco;MO
+Moldova;MD
+Mexican;MX
+Mayotte;MF
+Liberia;LI
+Lesotho;LT
+Lebanon;LE
+Laotian;LA
+Kosovar;YI
+Kirghiz;KG
+Jamaica;JM
+Ivorian;IV
+Italian;IT
+Ireland;EI
+Iceland;IC
+Hungary;HU
+Holland;NL
+Grenada;GJ
+Germany;GM
+Georgia;GG
+Finnish;FI
+Finland;FI
+E Timor;TT
+Estonia;EN
+Eritrea;ER
+England;UK
+Ecuador;EC
+Denmark;DA
+Cypriot;CY
+Croatia;HR
+Comoros;CN
+Chinese;CH
+Burundi;BY
+Burmese;BM
+British;UK
+Britain;UK
+Bolivia;BL
+Bermuda;BD
+Belgium;BE
+Belarus;BO
+Barbuda;AC
+Bahrain;BA
+Bahamas;BF
+Austria;AU
+Armenia;AM
+Antigua;AC
+Andorra;AN
+America;US
+Algeria;AG
+Albania;AL
+Lao PDR;LA
+Zambia;ZA
+W Bank;PT
+Uganda;UG
+U.S.A.;US
+Tuvalu;TV
+Turkey;TU
+Tobago;TD
+TAIWAN;TW
+Sweden;SW
+Somali;SO
+"SKorea";KS
+Serbia;RI
+Republic of Serbia;RI
+Rwanda;RW
+Russia;RS
+RUNION;RE
+Poland;PL
+Panama;PM
+Norway;NO
+"NKorea";KN
+Monaco;MN
+Mexico;MX
+Malawi;MI
+Latvia;LG
+Kuwait;KU
+Kosovo;KV
+Republic of Kosovo;KV
+Kirgiz;KG
+Kyrgyz;KG
+Kazakh;KZ
+Jordan;JO
+Jersey;JE
+Israel;IS
+Guyana;GY
+Guinea;GV
+Greece;GR
+German;GM
+GAMBIA;GA
+Gambia;GA
+French;FR
+France;FR
+Danish;DA
+Cyprus;CY
+Canada;CA
+Brunei;BX
+Briton;UK
+Brazil;BR
+Bosnia;BK
+Bhutan;BT
+Belize;BH
+Angola;AO
+Afghan;AF
+Zaire;CG
+Yemen;YM
+Welsh;UK
+Wales;UK
+Uzbek;UZ
+Uzbeg;UZ
+Uzbak;UZ
+Tonga;TN
+Timor;TT
+Tajik;TI
+Syria;SY
+Swiss;SZ
+Sudan;SU
+Spain;SP
+Saudi;SA
+Samoa;WS
+Qatar;QA
+Palau;PS
+Niger;NG
+Nepal;NP
+Nauru;NR
+Malta;MT
+MACAU;MC
+Macao;MC
+Libya;LY
+KOREA;KN
+Kenya;KE
+Kazak;KZ
+Japan;JA
+Italy;IT
+Irish;EI
+India;IN
+Haiti;HA
+Greek;GR
+Ghana;GH
+Gabon;GB
+Finns;FI
+Egypt;EG
+Dutch;DA
+Danes;DA
+Congo;CF
+China;CH
+Chile;CI
+BURMA;BM
+Brits;UK
+Benin;BN
+Aruba;AA
+U.S.;US
+Togo;TO
+Thai;TH
+Serb;YI
+Peru;PE
+Oman;MU
+Niue;NE
+Mali;ML
+Laos;LA
+Iraq;IZ
+Iran;IR
+Guam;GQ
+Gaza;PT
+Fiji;FJ
+"DPRK";KN
+Dane;DA
+Cuba;CU
+Chad;CD
+"USA";US
+"UAE";AE
+"DRC";CG
+"US";US
+"UK";UK
+Turks and Caicos;TK
+Caicos;TK
+McDonald Islands;HM
+St. Kitts;SC
+Caicos Islands;TK
+South Sandwich Islands;SX
+Ashmore and Cartier;AT
+Sao Tome;TP
+Miquelon;SB
+The Grenadines;VC
+Heard Island;HM
+French Antarctic Lands;FS
+Cartier Islands;AT
+Nevis;SC
+Caymans;CJ
+African American;US
+Curaçao;UC
+Curazao;UC
+Qúracao;UC
+Curacao;UC
+Saint Martin;RN
+Sint Maarten;NN
+Saint Barthelemy;TB
+Saint Barthélemy;TB
+Saint Barts;TB
+Åland Islands;FI
+Aland Islands;FI
+Ahvenanmaa;FI
+Åland;FI
+Aland;FI
+Siachen Glacier;IN
+
+
+Turkish Republic of Northern Cyprus;TU
+Turkish Cypriot State;TU
+North Cyprus;TU
+Northern Cyprus;TU
+Turkish Cypriots;TU
+TRNC;TU
+
+Republic of Cyprus;CY
+Greek Cypriot;CY
+Cypriot;CY
+
+
+Indian Ocean Ter.;IO
