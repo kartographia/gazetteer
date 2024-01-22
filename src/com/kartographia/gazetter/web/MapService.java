@@ -165,8 +165,7 @@ public class MapService extends WebService {
             Color lineColor = new Color(181,182,181);
             Color fillColor = new Color(246,248,246);
 
-            Connection conn = null;
-            try{
+            try (Connection conn = database.getConnection()) {
 
               //Get tile boundary and expand it by 10%
                 double d = Math.max(MapTile.diff(mapTile.getWest(), mapTile.getEast()), MapTile.diff(mapTile.getSouth(), mapTile.getNorth()))*0.10;
@@ -195,10 +194,9 @@ public class MapService extends WebService {
 
               //Execute query and generate list of polygons
                 ArrayList<Polygon> polygons = new ArrayList<>();
-                conn = database.getConnection();
-                for (Recordset rs : conn.getRecordset(sql)){
+                for (javaxt.sql.Record record : conn.getRecords(sql)){
 
-                    Geometry g = new WKTReader().read(rs.getValue(0).toString());
+                    Geometry g = new WKTReader().read(record.get(0).toString());
                     if (g instanceof Polygon){
                         Polygon p = (Polygon) g;
                         polygons.add(p);
@@ -211,7 +209,7 @@ public class MapService extends WebService {
                         }
                     }
                 }
-                conn.close();
+
 
 
               //Render polygons using specialized mapping function for countries
@@ -219,7 +217,6 @@ public class MapService extends WebService {
 
             }
             catch(Exception e){
-                if (conn!=null) conn.close();
                 return new ServiceResponse(e);
             }
 
@@ -337,18 +334,17 @@ public class MapService extends WebService {
 
 
       //Execute query and return response
-        Connection conn = null;
-        try{
+        try (Connection conn = database.getConnection()) {
             JSONArray arr = new JSONArray();
             LinkedHashMap<String, JSONObject> uniquePoints = new java.util.LinkedHashMap<>();
-            conn = database.getConnection();
-            for (Recordset rs : conn.getRecordset(sql)){
-                Long id = rs.getValue("id").toLong();
-                BigDecimal latitude = rs.getValue("latitude").toBigDecimal();
-                BigDecimal longitude = rs.getValue("longitude").toBigDecimal();
-                Long deviceID = rs.getValue("device_id").toLong();
-                Double distance = rs.getValue("distance").toDouble();
-                javaxt.utils.Date date = rs.getValue("date").toDate();
+
+            for (javaxt.sql.Record record : conn.getRecords(sql)){
+                Long id = record.get("id").toLong();
+                BigDecimal latitude = record.get("latitude").toBigDecimal();
+                BigDecimal longitude = record.get("longitude").toBigDecimal();
+                Long deviceID = record.get("device_id").toLong();
+                Double distance = record.get("distance").toDouble();
+                javaxt.utils.Date date = record.get("date").toDate();
 
               //Generate json. Only include unique points for each device.
                 String key = deviceID + "|" + latitude + "|" + longitude;
@@ -366,11 +362,9 @@ public class MapService extends WebService {
             }
 
 
-            conn.close();
             return new ServiceResponse(arr);
         }
         catch(Exception e){
-            if (conn!=null) conn.close();
             return new ServiceResponse(e);
         }
     }
@@ -436,24 +430,19 @@ public class MapService extends WebService {
 
 
       //Execute query and return response
-        Connection conn = null;
-        try{
+        try (Connection conn = database.getConnection()) {
             JSONArray arr = new JSONArray();
-            conn = database.getConnection();
-            for (Recordset rs : conn.getRecordset(sql)){
+            for (javaxt.sql.Record record : conn.getRecords(sql)){
                 JSONObject json = new JSONObject();
-                json.set("n", rs.getValue("n"));
-                json.set("g", rs.getValue("g"));
-                json.set("cc", rs.getValue("cc"));
-                json.set("distance", rs.getValue("distance"));
+                json.set("n", record.get("n"));
+                json.set("g", record.get("g"));
+                json.set("cc", record.get("cc"));
+                json.set("distance", record.get("distance"));
                 arr.add(json);
             }
-
-            conn.close();
             return new ServiceResponse(arr);
         }
         catch(Exception e){
-            if (conn!=null) conn.close();
             return new ServiceResponse(e);
         }
 

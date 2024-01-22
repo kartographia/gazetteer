@@ -6,26 +6,16 @@ import java.util.*;
 import java.sql.SQLException;
 
 public class DbUtils {
+
+
   //**************************************************************************
   //** getDate
   //**************************************************************************
   /** Returns the current date in the database.
    */
     public static javaxt.utils.Date getDate(Database database) throws SQLException {
-
-        Connection conn = null;
-        try{
-            javaxt.utils.Date date = null;
-            conn = database.getConnection();
-            for (Recordset rs : conn.getRecordset("select now()")){
-                date = rs.getValue(0).toDate();
-            }
-            conn.close();
-            return date;
-        }
-        catch(SQLException e){
-            if (conn!=null) conn.close();
-            throw e;
+        try (Connection conn = database.getConnection()) {
+            return conn.getRecord("select now()").get(0).toDate();
         }
     }
 
@@ -42,19 +32,13 @@ public class DbUtils {
         " where source_id=" + source.getID() +
         " group by country_code order by country_code";
 
-        LinkedHashMap<String, Integer> updates = new LinkedHashMap<String, Integer>();
-        Connection conn = null;
-        try{
-            conn = database.getConnection();
-            for (Recordset rs : conn.getRecordset(sql)){
-                updates.put(rs.getValue(0).toString(), rs.getValue(1).toInteger());
+        LinkedHashMap<String, Integer> updates = new LinkedHashMap<>();
+
+        try (Connection conn = database.getConnection()) {
+            for (javaxt.sql.Record record : conn.getRecords(sql)){
+                updates.put(record.get(0).toString(), record.get(1).toInteger());
             }
-            conn.close();
             return updates;
-        }
-        catch(SQLException e){
-            if (conn!=null) conn.close();
-            throw e;
         }
     }
 

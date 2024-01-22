@@ -37,9 +37,9 @@ public class VMAP {
 
         boolean isValidated = false;
 
-        Iterator<Record> it = shp.getRecords();
+        Iterator<openmap.Record> it = shp.getRecords();
         while (it.hasNext()){
-            Record record = it.next();
+            openmap.Record record = it.next();
             counter.updateCount();
 
             if (!isValidated){

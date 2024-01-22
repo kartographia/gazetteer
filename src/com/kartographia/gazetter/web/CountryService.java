@@ -59,13 +59,11 @@ public class CountryService {
         ") as x inner join vars as f on f.country_code = x.country_code and f.type = x.mintype order by f.name";
 
 
-        Connection conn = null;
-        try{
+        try (Connection conn = database.getConnection()) {
             JSONArray arr = new JSONArray();
-            conn = database.getConnection();
-            for (Recordset rs : conn.getRecordset(sql)){
+            for (javaxt.sql.Record record : conn.getRecords(sql)){
                 JSONObject json = new JSONObject();
-                for (Field field : rs.getFields()){
+                for (Field field : record.getFields()){
                     String fieldName = StringUtils.underscoreToCamelCase(field.getName());
                     if (fieldName.equals("type")) continue;
                     json.set(fieldName, field.getValue());
@@ -75,7 +73,6 @@ public class CountryService {
             return new ServiceResponse(arr);
         }
         catch(Exception e){
-            if (conn!=null) conn.close();
             return new ServiceResponse(e);
         }
     }
@@ -129,24 +126,21 @@ public class CountryService {
         "where place.country_code='" + cc.toUpperCase() +
             "' and place.type='boundary' and place.subtype='country'";
 
-        Connection conn = null;
-        try{
-            conn = database.getConnection();
+        try (Connection conn = database.getConnection()) {
             JSONArray arr = new JSONArray();
-            for (Recordset rs : conn.getRecordset(sql)){
+            for (javaxt.sql.Record record : conn.getRecords(sql)){
                 JSONObject json = new JSONObject();
-                for (Field field : rs.getFields()){
+                for (Field field : record.getFields()){
                     String fieldName = StringUtils.underscoreToCamelCase(field.getName());
                     if (fieldName.equals("uname")) continue;
                     json.set(fieldName, field.getValue());
                 }
                 arr.add(json);
             }
-            conn.close();
+
             return new ServiceResponse(arr);
         }
         catch(Exception e){
-            if (conn!=null) conn.close();
             return new ServiceResponse(e);
         }
     }
@@ -186,29 +180,27 @@ public class CountryService {
 
         ")))";
 
-        Connection conn = null;
-        try{
+        try (Connection conn = database.getConnection()) {
             JSONArray arr = new JSONArray();
-            conn = database.getConnection();
-            for (Recordset rs : conn.getRecordset(sql)){
-                String geom = rs.getValue(0).toString();
+
+            for (javaxt.sql.Record record : conn.getRecords(sql)){
+                String geom = record.get(0).toString();
                 if (geom!=null) arr.add(geom);
             }
 
 
             if (arr.isEmpty()){
                 sql = sql.replace("ST_Simplify(geom, 0.01)", "geom");
-                for (Recordset rs : conn.getRecordset(sql)){
-                    String geom = rs.getValue(0).toString();
+                for (javaxt.sql.Record record : conn.getRecords(sql)){
+                    String geom = record.get(0).toString();
                     if (geom!=null) arr.add(geom);
                 }
             }
 
-            conn.close();
+
             return new ServiceResponse(arr);
         }
         catch(Exception e){
-            if (conn!=null) conn.close();
             return new ServiceResponse(e);
         }
     }
