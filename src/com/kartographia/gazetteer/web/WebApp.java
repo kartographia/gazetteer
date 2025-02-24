@@ -1,4 +1,4 @@
-package com.kartographia.gazetter.web;
+package com.kartographia.gazetteer.web;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.security.KeyStore;

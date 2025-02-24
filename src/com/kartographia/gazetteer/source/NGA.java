@@ -1,6 +1,11 @@
-package com.kartographia.gazetter.source;
-import com.kartographia.gazetter.*;
-import com.kartographia.gazetter.utils.*;
+package com.kartographia.gazetteer.source;
+import com.kartographia.gazetteer.utils.Counter;
+import com.kartographia.gazetteer.utils.DbUtils;
+import com.kartographia.gazetteer.utils.StringUtils;
+import com.kartographia.gazetteer.ChangeRequest;
+import com.kartographia.gazetteer.Place;
+import com.kartographia.gazetteer.Source;
+import com.kartographia.gazetteer.Name;
 import com.vividsolutions.jts.geom.*;
 
 //javaxt includes
@@ -29,9 +34,9 @@ import java.util.concurrent.ConcurrentHashMap;
  *  Used to parse and load data from NGA's GEOnet Names Server (GNS):
  *  http://geonames.nga.mil/gns/html/index.html
  *
- *  Note that the NGA gazetter is updated approximately once a week. Also, note
- *  that the file format changes periodically. Information on the file format
- *  can be found here:
+ *  Note that the NGA gazetteer is updated approximately once a week. Also,
+ *  note that the file format changes periodically. Information on the file
+ *  format can be found here:
  *  http://geonames.nga.mil/gns/html/gis_countryfiles.html
  *
  ******************************************************************************/

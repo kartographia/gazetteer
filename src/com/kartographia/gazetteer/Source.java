@@ -1,4 +1,4 @@
-package com.kartographia.gazetter;
+package com.kartographia.gazetteer;
 import javaxt.json.*;
 import java.sql.SQLException;
 

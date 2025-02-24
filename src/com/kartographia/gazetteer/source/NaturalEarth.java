@@ -1,6 +1,8 @@
-package com.kartographia.gazetter.source;
-import com.kartographia.gazetter.*;
-import com.kartographia.gazetter.utils.*;
+package com.kartographia.gazetteer.source;
+import com.kartographia.gazetteer.utils.Counter;
+import com.kartographia.gazetteer.Place;
+import com.kartographia.gazetteer.Name;
+import com.kartographia.gazetteer.Source;
 import com.vividsolutions.jts.geom.Geometry;
 
 import java.util.*;

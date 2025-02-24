@@ -1,4 +1,4 @@
-package com.kartographia.gazetter;
+package com.kartographia.gazetteer;
 import javaxt.express.utils.DbUtils;
 import javaxt.json.*;
 import javaxt.sql.*;

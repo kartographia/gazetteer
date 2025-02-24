@@ -1,4 +1,4 @@
-package com.kartographia.gazetter.data;
+package com.kartographia.gazetteer.data;
 
 import java.util.*;
 import javaxt.express.utils.CSV;

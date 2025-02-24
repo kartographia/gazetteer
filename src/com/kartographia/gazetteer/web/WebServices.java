@@ -1,8 +1,9 @@
-package com.kartographia.gazetter.web;
+package com.kartographia.gazetteer.web;
+import com.kartographia.gazetteer.Place;
+import com.kartographia.gazetteer.Name;
 import javaxt.express.WebService;
 import javaxt.express.ServiceResponse;
 import javaxt.express.ServiceRequest;
-import com.kartographia.gazetter.*;
 import java.io.IOException;
 import javaxt.http.servlet.*;
 import javaxt.io.Jar;
@@ -22,7 +23,7 @@ public class WebServices extends WebService {
         this.database = database;
 
       //Register classes that this service will support
-        Jar jar = new Jar(com.kartographia.gazetter.Source.class);
+        Jar jar = new Jar(com.kartographia.gazetteer.Source.class);
         for (Class c : jar.getClasses()){
             if (javaxt.sql.Model.class.isAssignableFrom(c)){
                 addClass(c);

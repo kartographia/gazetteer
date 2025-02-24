@@ -1,5 +1,5 @@
-package com.kartographia.gazetter.web;
-import com.kartographia.gazetter.*;
+package com.kartographia.gazetteer.web;
+import com.kartographia.gazetteer.Place;
 
 import javaxt.express.ServiceRequest;
 import javaxt.express.ServiceResponse;

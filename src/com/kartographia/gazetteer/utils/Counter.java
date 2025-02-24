@@ -1,5 +1,5 @@
-package com.kartographia.gazetter.utils;
-import static com.kartographia.gazetter.utils.StringUtils.*;
+package com.kartographia.gazetteer.utils;
+import static com.kartographia.gazetteer.utils.StringUtils.*;
 import java.util.concurrent.atomic.AtomicLong;
   /** Used to render status updates to the console.
    */

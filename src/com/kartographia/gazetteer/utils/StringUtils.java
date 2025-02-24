@@ -1,4 +1,4 @@
-package com.kartographia.gazetter.utils;
+package com.kartographia.gazetteer.utils;
 import java.util.Locale;
 
 public class StringUtils {

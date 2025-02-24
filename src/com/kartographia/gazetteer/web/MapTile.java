@@ -1,4 +1,4 @@
-package com.kartographia.gazetter.web;
+package com.kartographia.gazetteer.web;
 
 import com.vividsolutions.jts.geom.*;
 

@@ -1,6 +1,8 @@
-package com.kartographia.gazetter.source;
-import com.kartographia.gazetter.utils.*;
-import com.kartographia.gazetter.*;
+package com.kartographia.gazetteer.source;
+import com.kartographia.gazetteer.utils.Counter;
+import com.kartographia.gazetteer.utils.DbUtils;
+import com.kartographia.gazetteer.Place;
+import com.kartographia.gazetteer.Edit;
 import javaxt.json.*;
 import javaxt.sql.*;
 import java.sql.SQLException;

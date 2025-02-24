@@ -1,5 +1,5 @@
-package com.kartographia.gazetter.utils;
-import com.kartographia.gazetter.Source;
+package com.kartographia.gazetteer.utils;
+import com.kartographia.gazetteer.Source;
 import javaxt.sql.*;
 
 import java.util.*;

@@ -1,7 +1,7 @@
-package com.kartographia.gazetter;
-import com.kartographia.gazetter.utils.*;
-import com.kartographia.gazetter.source.*;
-import com.kartographia.gazetter.web.WebApp;
+package com.kartographia.gazetteer;
+import com.kartographia.gazetteer.utils.*;
+import com.kartographia.gazetteer.source.*;
+import com.kartographia.gazetteer.web.WebApp;
 
 import javaxt.io.*;
 import javaxt.sql.*;
