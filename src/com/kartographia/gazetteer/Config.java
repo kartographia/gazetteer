@@ -1,8 +1,15 @@
 package com.kartographia.gazetteer;
-import javaxt.express.utils.DbUtils;
-import javaxt.json.*;
-import javaxt.sql.*;
+
 import java.util.*;
+import java.util.concurrent.atomic.AtomicBoolean;
+
+import javaxt.sql.*;
+import javaxt.json.*;
+
+import javaxt.express.utils.DbUtils;
+import static javaxt.express.ConfigFile.updateDir;
+import static javaxt.express.ConfigFile.updateFile;
+
 
 //******************************************************************************
 //**  Config Class
@@ -15,7 +22,8 @@ import java.util.*;
 public class Config {
 
     private static javaxt.express.Config config = new javaxt.express.Config();
-    private Config(){}
+    private static AtomicBoolean dbInitialized = new AtomicBoolean(false);
+    protected Config(){}
 
 
   //**************************************************************************
@@ -23,7 +31,7 @@ public class Config {
   //**************************************************************************
   /** Used to load a config file (JSON) and update config settings
    */
-    public static void load(javaxt.io.File configFile, javaxt.io.Jar jar) throws Exception {
+    public static void load(javaxt.io.File configFile) throws Exception {
 
 
       //Parse config file
@@ -48,23 +56,11 @@ public class Config {
         dbConfig.remove("tablespace");
 
 
-      //Update relative paths in the web config
-        JSONObject webConfig = json.get("webserver").toJSONObject();
-        updateDir("webDir", webConfig, configFile, false);
-        updateDir("logDir", webConfig, configFile, true);
-        updateDir("jobDir", webConfig, configFile, true);
-        updateDir("scriptDir", webConfig, configFile, false);
-        updateFile("keystore", webConfig, configFile);
-
-
       //Load config
         config.init(json);
 
 
-
       //Add additional properties to the config
-        config.set("jar", jar);
-        config.set("configFile", configFile);
         Properties props = config.getDatabase().getProperties();
         if (props==null){
             props = new Properties();
@@ -77,64 +73,82 @@ public class Config {
 
 
   //**************************************************************************
-  //** initDatabase
+  //** getDatabase
   //**************************************************************************
-  /** Used to initialize the database
-   */
-    public static void initDatabase() throws Exception {
+    public static Database getDatabase() throws Exception{
+      //Get database
         Database database = config.getDatabase();
+        if (database==null) throw new Exception("Invalid database");
 
 
-      //Get database schema
-        String schema = null;
-        Object obj = config.getDatabase().getProperties().get("schema");
-        if (obj!=null){
-            javaxt.io.File schemaFile = (javaxt.io.File) obj;
-            if (schemaFile.exists()){
-                schema = schemaFile.getText();
+      //Initialize the database as needed
+        synchronized(dbInitialized){
+            boolean initialized = dbInitialized.get();
+            if (!initialized){
+
+              //Get database schema
+                String schema = null;
+                Object obj = config.getDatabase().getProperties().get("schema");
+                if (obj!=null){
+                    javaxt.io.File schemaFile = (javaxt.io.File) obj;
+                    if (schemaFile.exists()){
+                        schema = schemaFile.getText();
+                    }
+                }
+                if (schema==null) throw new Exception("Schema not found");
+
+
+              //Get updates
+                obj = config.getDatabase().getProperties().get("updates");
+                if (obj!=null){
+                    javaxt.io.File updateFile = (javaxt.io.File) obj;
+                    if (updateFile.exists()){
+                        schema += "\r\n" + updateFile.getText();
+                    }
+                }
+
+
+              //Get tablespace
+                obj = config.getDatabase().getProperties().get("tablespace");
+                String tablespace = obj==null ? null : obj.toString();
+
+
+
+              //Initialize schema (create tables, indexes, etc)
+                DbUtils.initSchema(database, schema, tablespace);
+
+
+              //Enable database caching
+                database.enableMetadataCache(true);
+
+
+              //Inititalize connection pool
+                database.initConnectionPool();
+
+
+              //Initialize models
+                javaxt.io.Jar jar = (javaxt.io.Jar) config.get("jar").toObject();
+                Model.init(jar, database.getConnectionPool());
+
+
+              //Create sources as needed
+                for (String name : new String[]{"NGA", "USGS", "VLIZ", "OSM", "PB"}){
+                    Source source = Source.get("name=",name);
+                    if (source==null){
+                        source = new Source();
+                        source.setName(name);
+                        source.save();
+                    }
+                }
+
+
+              //Update status
+                dbInitialized.set(true);
+
             }
         }
-        if (schema==null) throw new Exception("Schema not found");
 
-
-      //Get updates
-        obj = config.getDatabase().getProperties().get("updates");
-        if (obj!=null){
-            javaxt.io.File updateFile = (javaxt.io.File) obj;
-            if (updateFile.exists()){
-                schema += "\r\n" + updateFile.getText();
-            }
-        }
-
-
-      //Get tablespace
-        obj = config.getDatabase().getProperties().get("tablespace");
-        String tablespace = obj==null ? null : obj.toString();
-
-
-
-      //Initialize schema (create tables, indexes, etc)
-        DbUtils.initSchema(database, schema, tablespace);
-
-
-      //Inititalize connection pool
-        database.initConnectionPool();
-
-
-      //Initialize models
-        javaxt.io.Jar jar = (javaxt.io.Jar) config.get("jar").toObject();
-        Model.init(jar, database.getConnectionPool());
-
-
-      //Create sources as needed
-        for (String name : new String[]{"NGA", "USGS", "VLIZ", "OSM", "PB"}){
-            Source source = Source.get("name=",name);
-            if (source==null){
-                source = new Source();
-                source.setName(name);
-                source.save();
-            }
-        }
+        return database;
     }
 
 
@@ -165,139 +179,4 @@ public class Config {
         config.set(key, value);
     }
 
-
-  //**************************************************************************
-  //** getDatabase
-  //**************************************************************************
-    public static javaxt.sql.Database getDatabase(){
-        return config.getDatabase();
-    }
-
-
-  //**************************************************************************
-  //** getBaseMaps
-  //**************************************************************************
-    public static JSONArray getBaseMaps(){
-        return config.get("basemaps").toJSONArray();
-    }
-
-
-  //**************************************************************************
-  //** getFile
-  //**************************************************************************
-  /** Returns a File for a given path
-   *  @param path Full canonical path to a file or a relative path (relative
-   *  to the jarFile)
-   */
-    public static javaxt.io.File getFile(String path, javaxt.io.File jarFile){
-        javaxt.io.File file = new javaxt.io.File(path);
-        if (!file.exists()){
-            file = new javaxt.io.File(jarFile.MapPath(path));
-        }
-        return file;
-    }
-
-    private static javaxt.io.File getFile(String path, java.io.File jarFile){
-        return getFile(path, new javaxt.io.File(jarFile));
-    }
-
-
-
-  //**************************************************************************
-  //** updateDir
-  //**************************************************************************
-  /** Used to update a path to a directory defined in a config file. Resolves
-   *  both canonical and relative paths (relative to the configFile).
-   */
-    public static void updateDir(String key, JSONObject config, javaxt.io.File configFile, boolean create){
-        if (config.has(key)){
-            String path = config.get(key).toString();
-            if (path==null){
-                config.remove(key);
-            }
-            else{
-                path = path.trim();
-                if (path.length()==0){
-                    config.remove(key);
-                }
-                else{
-
-                    javaxt.io.Directory dir = new javaxt.io.Directory(path);
-                    if (dir.exists()){
-                        try{
-                            java.io.File f = new java.io.File(path);
-                            javaxt.io.Directory d = new javaxt.io.Directory(f.getCanonicalFile());
-                            if (!dir.toString().equals(d.toString())){
-                                dir = d;
-                            }
-                        }
-                        catch(Exception e){
-                        }
-                    }
-                    else{
-                        dir = new javaxt.io.Directory(new java.io.File(configFile.MapPath(path)));
-                    }
-
-
-                    if (!dir.exists() && create) dir.create();
-
-
-                    if (dir.exists()){
-                        config.set(key, dir.toString());
-                    }
-                    else{
-                        config.remove(key);
-                    }
-                }
-            }
-        }
-    }
-
-
-  //**************************************************************************
-  //** updateFile
-  //**************************************************************************
-  /** Used to update a path to a file defined in a config file. Resolves
-   *  both canonical and relative paths (relative to the configFile).
-   */
-    public static void updateFile(String key, JSONObject config, javaxt.io.File configFile){
-        if (config.has(key)){
-            String path = config.get(key).toString();
-            if (path==null){
-                config.remove(key);
-            }
-            else{
-                path = path.trim();
-                if (path.length()==0){
-                    config.remove(key);
-                }
-                else{
-
-                    javaxt.io.File file = new javaxt.io.File(path);
-                    if (file.exists()){
-                        try{
-                            java.io.File f = new java.io.File(path);
-                            javaxt.io.File _file = new javaxt.io.File(f.getCanonicalFile());
-                            if (!file.toString().equals(_file.toString())){
-                                file = _file;
-                            }
-                        }
-                        catch(Exception e){
-                        }
-                    }
-                    else{
-                        file = new javaxt.io.File(configFile.MapPath(path));
-                    }
-
-                    config.set(key, file.toString());
-//                    if (file.exists()){
-//                        config.set(key, file.toString());
-//                    }
-//                    else{
-//                        config.remove(key);
-//                    }
-                }
-            }
-        }
-    }
 }
