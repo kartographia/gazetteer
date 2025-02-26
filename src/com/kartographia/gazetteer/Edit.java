@@ -24,15 +24,15 @@ public class Edit extends javaxt.sql.Model {
   //** Constructor
   //**************************************************************************
     public Edit(){
-        super("gazetter.edit", new java.util.HashMap<String, String>() {{
+        super("gazetteer.edit", java.util.Map.ofEntries(
             
-            put("summary", "summary");
-            put("details", "details");
-            put("info", "info");
-            put("startDate", "start_date");
-            put("endDate", "end_date");
+            java.util.Map.entry("summary", "summary"),
+            java.util.Map.entry("details", "details"),
+            java.util.Map.entry("info", "info"),
+            java.util.Map.entry("startDate", "start_date"),
+            java.util.Map.entry("endDate", "end_date")
 
-        }});
+        ));
         
     }
 

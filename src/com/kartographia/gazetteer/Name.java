@@ -28,19 +28,19 @@ public class Name extends javaxt.sql.Model {
   //** Constructor
   //**************************************************************************
     public Name(){
-        super("gazetter.name", new java.util.HashMap<String, String>() {{
+        super("gazetteer.name", java.util.Map.ofEntries(
             
-            put("name", "name");
-            put("uname", "uname");
-            put("languageCode", "language_code");
-            put("type", "type");
-            put("place", "place_id");
-            put("source", "source_id");
-            put("sourceKey", "source_key");
-            put("sourceDate", "source_date");
-            put("info", "info");
+            java.util.Map.entry("name", "name"),
+            java.util.Map.entry("uname", "uname"),
+            java.util.Map.entry("languageCode", "language_code"),
+            java.util.Map.entry("type", "type"),
+            java.util.Map.entry("place", "place_id"),
+            java.util.Map.entry("source", "source_id"),
+            java.util.Map.entry("sourceKey", "source_key"),
+            java.util.Map.entry("sourceDate", "source_date"),
+            java.util.Map.entry("info", "info")
 
-        }});
+        ));
         
     }
 

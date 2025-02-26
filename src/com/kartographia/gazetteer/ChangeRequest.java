@@ -23,14 +23,14 @@ public class ChangeRequest extends javaxt.sql.Model {
   //** Constructor
   //**************************************************************************
     public ChangeRequest(){
-        super("gazetter.change_request", new java.util.HashMap<String, String>() {{
+        super("gazetteer.change_request", java.util.Map.ofEntries(
             
-            put("place", "place_id");
-            put("info", "info");
-            put("status", "status");
-            put("lastModified", "last_modified");
+            java.util.Map.entry("place", "place_id"),
+            java.util.Map.entry("info", "info"),
+            java.util.Map.entry("status", "status"),
+            java.util.Map.entry("lastModified", "last_modified")
 
-        }});
+        ));
         
     }
 

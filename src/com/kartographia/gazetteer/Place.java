@@ -1,8 +1,8 @@
 package com.kartographia.gazetteer;
 import javaxt.json.*;
 import java.sql.SQLException;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.io.WKTReader;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.io.WKTReader;
 
 //******************************************************************************
 //**  Place Class
@@ -31,21 +31,21 @@ public class Place extends javaxt.sql.Model {
   //** Constructor
   //**************************************************************************
     public Place(){
-        super("gazetter.place", new java.util.HashMap<String, String>() {{
+        super("gazetteer.place", java.util.Map.ofEntries(
             
-            put("countryCode", "country_code");
-            put("admin1", "admin1");
-            put("admin2", "admin2");
-            put("geom", "geom");
-            put("type", "type");
-            put("subtype", "subtype");
-            put("rank", "rank");
-            put("source", "source_id");
-            put("sourceKey", "source_key");
-            put("sourceDate", "source_date");
-            put("info", "info");
+            java.util.Map.entry("countryCode", "country_code"),
+            java.util.Map.entry("admin1", "admin1"),
+            java.util.Map.entry("admin2", "admin2"),
+            java.util.Map.entry("geom", "geom"),
+            java.util.Map.entry("type", "type"),
+            java.util.Map.entry("subtype", "subtype"),
+            java.util.Map.entry("rank", "rank"),
+            java.util.Map.entry("source", "source_id"),
+            java.util.Map.entry("sourceKey", "source_key"),
+            java.util.Map.entry("sourceDate", "source_date"),
+            java.util.Map.entry("info", "info")
 
-        }});
+        ));
         
     }
 
@@ -85,7 +85,7 @@ public class Place extends javaxt.sql.Model {
             this.countryCode = getValue(rs, "country_code").toString();
             this.admin1 = getValue(rs, "admin1").toString();
             this.admin2 = getValue(rs, "admin2").toString();
-            this.geom = new WKTReader().read(getValue(rs, "geom").toString());
+            try{this.geom = new WKTReader().read(getValue(rs, "geom").toString());}catch(Exception e){}
             this.type = getValue(rs, "type").toString();
             this.subtype = getValue(rs, "subtype").toString();
             this.rank = getValue(rs, "rank").toInteger();

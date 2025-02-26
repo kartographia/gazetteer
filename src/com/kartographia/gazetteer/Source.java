@@ -22,13 +22,13 @@ public class Source extends javaxt.sql.Model {
   //** Constructor
   //**************************************************************************
     public Source(){
-        super("gazetter.source", new java.util.HashMap<String, String>() {{
+        super("gazetteer.source", java.util.Map.ofEntries(
             
-            put("name", "name");
-            put("description", "description");
-            put("info", "info");
+            java.util.Map.entry("name", "name"),
+            java.util.Map.entry("description", "description"),
+            java.util.Map.entry("info", "info")
 
-        }});
+        ));
         
     }
 
