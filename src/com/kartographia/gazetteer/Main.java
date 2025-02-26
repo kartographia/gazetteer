@@ -6,6 +6,7 @@ import java.util.*;
 
 import javaxt.io.*;
 import javaxt.sql.*;
+import javaxt.express.*;
 import static javaxt.utils.Console.console;
 
 
@@ -40,7 +41,7 @@ public class Main {
 
       //Get config file
         File configFile = (args.containsKey("-config")) ?
-            Config.getFile(args.get("-config"), jarFile) :
+            ConfigFile.getFile(args.get("-config"), jarFile) :
             new File(jar.getFile().getParentFile(), "config.json");
 
         if (!configFile.exists()) {
@@ -50,18 +51,18 @@ public class Main {
 
 
       //Initialize config
-        Config.load(configFile, jar);
+        Config.load(configFile);
 
 
 
 
       //Process command line args
         if (args.containsKey("-import")){
-            Config.initDatabase();
             Database database = Config.getDatabase();
 
-            int numThreads = 12;
-            try{numThreads = Integer.parseInt(args.get("-t"));}catch(Exception e){}
+            Integer numThreads = console.getValue(args, "-threads", "-t").toInteger();
+            if (numThreads==null) numThreads = 12;
+
 
             File file = new File(args.get("-import"));
             if (file.exists()){
@@ -145,7 +146,7 @@ public class Main {
 
         }
         else if (args.containsKey("-download")){
-            Config.initDatabase();
+
             Database database = Config.getDatabase();
 
             String source = args.get("-download");
