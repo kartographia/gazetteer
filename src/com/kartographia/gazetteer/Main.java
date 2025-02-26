@@ -1,14 +1,13 @@
 package com.kartographia.gazetteer;
 import com.kartographia.gazetteer.utils.*;
 import com.kartographia.gazetteer.source.*;
-import com.kartographia.gazetteer.web.WebApp;
+
+import java.util.*;
 
 import javaxt.io.*;
 import javaxt.sql.*;
-import javaxt.json.JSONObject;
 import static javaxt.utils.Console.console;
 
-import java.util.*;
 
 
 //******************************************************************************
@@ -177,23 +176,6 @@ public class Main {
         }
         else if (args.containsKey("-update")){
 
-        }
-        else{
-            Config.initDatabase();
-            Database database = Config.getDatabase();
-            try{
-                if (!Config.has("webserver")){
-                    throw new Exception("Config file is missing \"webserver\" config information");
-                }
-                else{
-                    JSONObject webConfig = Config.get("webserver").toJSONObject();
-                    new WebApp(webConfig, database);
-                    //SyncService.start();
-                }
-            }
-            catch(Exception e){
-                System.out.println(e.getMessage());
-            }
         }
     }
 
