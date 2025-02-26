@@ -12,7 +12,7 @@ select row_number() OVER () as row_id, id as name_id, place_id, name, country_co
 
 select * from (
 select name.id, name.place_id, name.name, country_code, rank, place.type, similarity(name, (select q from vars)) as rel
-from gazetter.place join gazetter.name on place.id=place_id
+from gazetteer.place join gazetteer.name on place.id=place_id
 where similarity(name, (select q from vars))>0.9 --and place.type='populated place'
 order by rel desc, rank, name.type limit 10
 ) a
@@ -27,7 +27,7 @@ union all
 
 select * from (
 select name.id, name.place_id, name.name, country_code, rank, place.type,  similarity(name, (select q from vars)) as rel
-from gazetter.place join gazetter.name on place.id=place_id
+from gazetteer.place join gazetteer.name on place.id=place_id
 where (DMETAPHONE_ALT(name) = DMETAPHONE_ALT((select q from vars))) --and place.type='populated place'
 order by rank, rel desc, name.type limit 15
 ) b
