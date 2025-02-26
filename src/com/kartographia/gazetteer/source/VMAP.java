@@ -1,13 +1,14 @@
 package com.kartographia.gazetteer.source;
 import com.kartographia.gazetteer.utils.Counter;
-import com.kartographia.gazetteer.Name;
-import com.kartographia.gazetteer.Place;
-import com.kartographia.gazetteer.Source;
-import com.vividsolutions.jts.geom.*;
+import com.kartographia.gazetteer.*;
+
 import javaxt.json.JSONObject;
 import javaxt.sql.Database;
 import java.util.*;
+
 import openmap.*;
+import org.locationtech.jts.geom.*;
+
 
 //******************************************************************************
 //**  VMAP Data Loader

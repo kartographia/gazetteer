@@ -1,9 +1,6 @@
 package com.kartographia.gazetteer.source;
 import com.kartographia.gazetteer.utils.Counter;
-import com.kartographia.gazetteer.Place;
-import com.kartographia.gazetteer.Source;
-import com.kartographia.gazetteer.ChangeRequest;
-import com.vividsolutions.jts.geom.*;
+import com.kartographia.gazetteer.*;
 
 //javaxt includes
 import javaxt.json.*;
@@ -21,6 +18,8 @@ import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.PreparedStatement;
+
+import org.locationtech.jts.geom.*;
 
 
 //******************************************************************************
@@ -229,7 +228,7 @@ public class USGS {
                     }
 
                     stmt = conn.getConnection().prepareStatement(
-                        "select id, source_date from gazetter.place where source_id=? and source_key=? and country_code=?"
+                        "select id, source_date from gazetteer.place where source_id=? and source_key=? and country_code=?"
                     );
                     set("stmt", stmt);
                 }
@@ -252,7 +251,7 @@ public class USGS {
                 }
 
 
-                rs.open("select * from gazetter.name where place_id=" + place.getID() +
+                rs.open("select * from gazetteer.name where place_id=" + place.getID() +
                 " and uname='" + uname.replace("'", "''") + "'", conn, false);
 
                 return rs;

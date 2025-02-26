@@ -1,12 +1,6 @@
 package com.kartographia.gazetteer.source;
-import com.kartographia.gazetteer.utils.Counter;
-import com.kartographia.gazetteer.utils.DbUtils;
-import com.kartographia.gazetteer.utils.StringUtils;
-import com.kartographia.gazetteer.ChangeRequest;
-import com.kartographia.gazetteer.Place;
-import com.kartographia.gazetteer.Source;
-import com.kartographia.gazetteer.Name;
-import com.vividsolutions.jts.geom.*;
+import com.kartographia.gazetteer.utils.*;
+import com.kartographia.gazetteer.*;
 
 //javaxt includes
 import javaxt.json.*;
@@ -26,6 +20,7 @@ import java.sql.PreparedStatement;
 import java.sql.SQLException;
 import java.util.concurrent.ConcurrentHashMap;
 
+import org.locationtech.jts.geom.*;
 
 //******************************************************************************
 //**  NGA Data Loader
@@ -451,7 +446,7 @@ public class NGA {
                     }
 
                     stmt = conn.getConnection().prepareStatement(
-                        "select id, source_date from gazetter.place where source_id=? and source_key=? and country_code=?"
+                        "select id, source_date from gazetteer.place where source_id=? and source_key=? and country_code=?"
                     );
                     set("stmt", stmt);
                 }
@@ -475,7 +470,7 @@ public class NGA {
                 }
 
 
-                rs.open("select * from gazetter.name where place_id=" + place.getID() +
+                rs.open("select * from gazetteer.name where place_id=" + place.getID() +
                 " and uname='" + name.getUname().replace("'", "''") + "'", conn, false);
 
                 return rs;

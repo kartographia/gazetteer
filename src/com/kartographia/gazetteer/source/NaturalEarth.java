@@ -1,9 +1,6 @@
 package com.kartographia.gazetteer.source;
 import com.kartographia.gazetteer.utils.Counter;
-import com.kartographia.gazetteer.Place;
-import com.kartographia.gazetteer.Name;
-import com.kartographia.gazetteer.Source;
-import com.vividsolutions.jts.geom.Geometry;
+import com.kartographia.gazetteer.*;
 
 import java.util.*;
 import java.util.zip.ZipEntry;
@@ -19,6 +16,8 @@ import static javaxt.utils.Console.console;
 import openmap.Field;
 import openmap.Record;
 import openmap.ShapeFile;
+
+import org.locationtech.jts.geom.*;
 
 
 //******************************************************************************

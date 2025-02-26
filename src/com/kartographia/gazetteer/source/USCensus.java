@@ -41,7 +41,7 @@ public class USCensus {
         javaxt.sql.Connection conn = database.getConnection();
         placeQuery = conn.getConnection().prepareStatement( //lon, lat, a1, uname
             "select place.id, ST_Distance(ST_Centroid(geom), ST_GeomFromText('POINT(? ?)', 4326), true) as distance " +
-            "from gazetter.place as place right join gazetter.place_name as place_name on place.id = place_name.place_id " +
+            "from gazetteer.place as place right join gazetteer.place_name as place_name on place.id = place_name.place_id " +
             "where country_code='US' and admin1=? and uname=UPPER(?)"
         );
 
