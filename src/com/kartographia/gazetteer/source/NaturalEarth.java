@@ -147,6 +147,8 @@ public class NaturalEarth {
                 e.printStackTrace();
             }
         }
+
+        counter.stop();
     }
 
 

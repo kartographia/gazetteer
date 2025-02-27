@@ -187,6 +187,7 @@ public class USCensus {
         placeQuery.close();
         conn.close();
         br.close();
+        counter.stop();
 
 
       //Update edit log

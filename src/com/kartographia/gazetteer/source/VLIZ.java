@@ -102,6 +102,8 @@ public class VLIZ {
             placeName.save();
         }
 
+        counter.stop();
+
     }
 
 }

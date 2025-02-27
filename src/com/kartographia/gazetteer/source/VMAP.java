@@ -92,6 +92,8 @@ public class VMAP {
                 e.printStackTrace();
             }
         }
+
+        counter.stop();
     }
 
 

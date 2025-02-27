@@ -297,6 +297,8 @@ public class USGS {
 
         pool.done();
         pool.join();
+
+        counter.stop();
     }
 
 
@@ -307,7 +309,7 @@ public class USGS {
    */
     public static File download(Directory downloadDir, boolean unzip) throws Exception {
         java.net.URL url = new java.net.URL(
-        "https://www.usgs.gov/core-science-systems/ngp/board-on-geographic-names/download-gnis-data");
+        "https://www.usgs.gov/us-board-on-geographic-names/download-gnis-data");
         javaxt.http.Response response = new javaxt.http.Request(url).getResponse();
         if (response.getStatus()!=200) throw new Exception("Failed to connect to " + url);
         String html = response.getText();
@@ -315,7 +317,7 @@ public class USGS {
         File file = null;
         for (javaxt.html.Element el : new javaxt.html.Parser(html).getElementsByTagName("a")){
             String text = el.getInnerText();
-            if (text.equals("National File")){
+            if (text.equals("All Names")){
                 String href = el.getAttribute("href");
                 String link = javaxt.html.Parser.MapPath(href, url);
                 String path = new javaxt.utils.URL(link).getPath();
@@ -325,10 +327,10 @@ public class USGS {
                 if (!file.exists()){
                     response = new javaxt.http.Request(link).getResponse();
                     if (response.getStatus()!=200) throw new Exception("Failed to download " + link);
-                    System.out.print("Downloading " + file.getName() + "...");
-                    java.io.InputStream is = response.getInputStream();
-                    file.write(is);
-                    is.close();
+                    System.out.print("Downloading " + file + "...");
+                    try (java.io.InputStream is = response.getInputStream()){
+                        file.write(is);
+                    }
                     System.out.println("Done!");
                 }
                 break;
