@@ -111,8 +111,7 @@ public class NGA {
                         savePlace(place, getPlaceQuery());
 
                         for (Name name : names){
-                            try{
-                                Recordset rs = getRecordset(place, name);
+                            try(Recordset rs = getRecordset(place, name)){
                                 if (rs.EOF) rs.addNew();
                                 rs.setValue("name", name.getName());
                                 rs.setValue("uname", name.getUname());
@@ -123,7 +122,6 @@ public class NGA {
                                 rs.setValue("source_key", name.getSourceKey());
                                 rs.setValue("source_date", name.getSourceDate());
                                 rs.update();
-                                rs.close();
                             }
                             catch(Exception e){
                                 //console.log(e.getMessage());
@@ -201,14 +199,14 @@ public class NGA {
 
 
       //Parse file and add records to the pool
-        BufferedReader br = getBufferedReader(file);
-        String[] cols = br.readLine().split(delimiter, -1);
-        for (String col : cols) header.add(col.trim().toLowerCase());
-        String row;
-        while ((row = br.readLine()) != null){
-            pool.add(row);
+        try (BufferedReader br = getBufferedReader(file)){
+            String[] cols = br.readLine().split(delimiter, -1);
+            for (String col : cols) header.add(col.trim().toLowerCase());
+            String row;
+            while ((row = br.readLine()) != null){
+                pool.add(row);
+            }
         }
-        br.close();
 
         pool.done();
         pool.join();
@@ -528,62 +526,6 @@ public class NGA {
 
 
   //**************************************************************************
-  //** getUpdates
-  //**************************************************************************
-  /** Used to scrape an NGA website and generate a list of country files that
-   *  appear to be newer that what we have in the database.
-   *  @return An array of JSON objects with country code, download link, and
-   *  date in YYYYMMDD format (e.g. 20120729)
-   */
-    public static JSONArray getUpdates(Database database) throws SQLException {
-
-        JSONArray arr = new JSONArray();
-
-
-
-        LinkedHashMap<String, Integer> recentUpdates = DbUtils.getRecentUpdates(source, database);
-
-
-
-        javaxt.http.Request request = new javaxt.http.Request("http://geonames.nga.mil/gns/html/namefiles.html");
-        javaxt.http.Response response = request.getResponse();
-        javaxt.html.Parser document = new javaxt.html.Parser(response.getText());
-        javaxt.html.Element tbody = document.getElementByTagName("tbody");
-        javaxt.html.Element[] rows = tbody.getElementsByTagName("tr");
-        for (int i=1; i<rows.length; i++){ //Skip header
-
-            try{
-                javaxt.html.Element[] col = rows[i].getElementsByTagName("td");
-                String link = col[0].getElementByTagName("a").getAttribute("href");
-                String cc = col[1].getInnerText().toUpperCase();
-                Integer date = cint(col[2].getInnerText().replace("-", ""));
-
-
-              //Update country code
-                if (cc.equals("AX") || cc.equals("DX")) cc = "UK";
-
-
-                Integer lastUpdate = recentUpdates.get(cc);
-                if (lastUpdate==null || date>lastUpdate){
-                    link = javaxt.html.Parser.MapPath(link, request.getURL());
-                    System.out.println(date + "\t" + cc + "\t" + link);
-
-                    JSONObject json = new JSONObject();
-                    json.set("cc", cc);
-                    json.set("date", date);
-                    json.set("link", link);
-                    arr.add(json);
-                }
-            }
-            catch(Exception e){
-                //e.printStackTrace();
-            }
-        }
-        return arr;
-    }
-
-
-  //**************************************************************************
   //** download
   //**************************************************************************
   /** Used to download the "Entire country files dataset" from the NGA website:
@@ -670,23 +612,23 @@ public class NGA {
       //Unzip as needed
         if (unzip){
             File countryFile = new File(file.getDirectory(), file.getName(false) + ".txt");
-            ZipInputStream zip = new ZipInputStream(file.getInputStream());
-            ZipEntry entry;
-            while((entry = zip.getNextEntry())!=null){
-                fileName = entry.getName();
-                if (fileName.equalsIgnoreCase("Countries.txt")){
-                    byte[] buffer = new byte[2048];
-                    java.io.FileOutputStream output = countryFile.getOutputStream();
-                    int len;
-                    while ((len = zip.read(buffer)) > 0){
-                        output.write(buffer, 0, len);
-                        output.flush();
+            try (ZipInputStream zip = new ZipInputStream(file.getInputStream())){
+                ZipEntry entry;
+                while((entry = zip.getNextEntry())!=null){
+                    fileName = entry.getName();
+                    if (fileName.equalsIgnoreCase("Countries.txt")){
+                        byte[] buffer = new byte[2048];
+                        try (java.io.FileOutputStream output = countryFile.getOutputStream()){
+                            int len;
+                            while ((len = zip.read(buffer)) > 0){
+                                output.write(buffer, 0, len);
+                                output.flush();
+                            }
+                        }
+                        break;
                     }
-                    output.close();
-                    break;
                 }
             }
-            zip.close();
         }
 
         return file;
@@ -760,12 +702,12 @@ public class NGA {
         placeQuery.setLong(1, place.getSource().getID());
         placeQuery.setLong(2, place.getSourceKey());
         placeQuery.setString(3, place.getCountryCode());
-        java.sql.ResultSet r2 = placeQuery.executeQuery();
-        while (r2.next()) {
-            placeID = r2.getLong(1);
-            currDate = r2.getInt(2);
+        try (java.sql.ResultSet r2 = placeQuery.executeQuery()){
+            while (r2.next()) {
+                placeID = r2.getLong(1);
+                currDate = r2.getInt(2);
+            }
         }
-        r2.close();
 
 
         if (placeID==null){
@@ -784,14 +726,73 @@ public class NGA {
         }
     }
 
+
+  //**************************************************************************
+  //** getUpdates
+  //**************************************************************************
+  /** Used to scrape an NGA website and generate a list of country files that
+   *  appear to be newer that what we have in the database.
+   *  @return An array of JSON objects with country code, download link, and
+   *  date in YYYYMMDD format (e.g. 20120729)
+   *  @deprecated
+   */
+    public static JSONArray getUpdates(Database database) throws SQLException {
+
+        JSONArray arr = new JSONArray();
+
+
+
+        LinkedHashMap<String, Integer> recentUpdates = DbUtils.getRecentUpdates(source, database);
+
+
+
+        javaxt.http.Request request = new javaxt.http.Request("http://geonames.nga.mil/gns/html/namefiles.html");
+        javaxt.http.Response response = request.getResponse();
+        javaxt.html.Parser document = new javaxt.html.Parser(response.getText());
+        javaxt.html.Element tbody = document.getElementByTagName("tbody");
+        javaxt.html.Element[] rows = tbody.getElementsByTagName("tr");
+        for (int i=1; i<rows.length; i++){ //Skip header
+
+            try{
+                javaxt.html.Element[] col = rows[i].getElementsByTagName("td");
+                String link = col[0].getElementByTagName("a").getAttribute("href");
+                String cc = col[1].getInnerText().toUpperCase();
+                Integer date = cint(col[2].getInnerText().replace("-", ""));
+
+
+              //Update country code
+                if (cc.equals("AX") || cc.equals("DX")) cc = "UK";
+
+
+                Integer lastUpdate = recentUpdates.get(cc);
+                if (lastUpdate==null || date>lastUpdate){
+                    link = javaxt.html.Parser.MapPath(link, request.getURL());
+                    System.out.println(date + "\t" + cc + "\t" + link);
+
+                    JSONObject json = new JSONObject();
+                    json.set("cc", cc);
+                    json.set("date", date);
+                    json.set("link", link);
+                    arr.add(json);
+                }
+            }
+            catch(Exception e){
+                //e.printStackTrace();
+            }
+        }
+        return arr;
+    }
+
+
   //**************************************************************************
   //** downloadUpdates
   //**************************************************************************
   /** Used to download country updates from NGA.
    *  @return List of files that were downloaded.
+   *  @deprecated 
    */
     public static ArrayList<File> downloadUpdates(JSONArray updates, Directory downloadDir){
-        ArrayList<File> files = new ArrayList<File>();
+        ArrayList<File> files = new ArrayList<>();
         for (int i=0; i<updates.length(); i++){
             JSONObject json = updates.get(i).toJSONObject();
             String cc = json.get("cc").toString();
@@ -802,25 +803,21 @@ public class NGA {
             if (!file.exists()){
                 javaxt.http.Response response = new javaxt.http.Request(link).getResponse();
 
-                try{
-                    ZipInputStream zip = new ZipInputStream(response.getInputStream());
+                try(ZipInputStream zip = new ZipInputStream(response.getInputStream())){
                     ZipEntry entry;
                     while((entry = zip.getNextEntry())!=null){
                         String fileName = entry.getName();
                         if (fileName.equalsIgnoreCase(cc + ".txt")){
                             byte[] buffer = new byte[2048];
-                            java.io.FileOutputStream output = file.getOutputStream();
-                            int len;
-                            while ((len = zip.read(buffer)) > 0){
-                                output.write(buffer, 0, len);
+                            try(java.io.FileOutputStream output = file.getOutputStream()){
+                                int len;
+                                while ((len = zip.read(buffer)) > 0){
+                                    output.write(buffer, 0, len);
+                                }
                             }
-                            output.close();
                             break;
                         }
                     }
-
-
-                    zip.close();
                 }
                 catch(Exception e){
                 }
