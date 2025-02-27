@@ -18,7 +18,6 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
-import java.util.concurrent.ConcurrentHashMap;
 
 import org.locationtech.jts.geom.*;
 
@@ -93,348 +92,54 @@ public class NGA {
             localeMap.put(languageCode, locale);
         }
 
+        ArrayList<String> header = new ArrayList<>();
 
 
       //Get places and place names from the file
-        ConcurrentHashMap<String, Place> places = new ConcurrentHashMap<>();
-        ConcurrentHashMap<String, ArrayList<Name>> placeNames = new ConcurrentHashMap<>();
         ThreadPool pool = new ThreadPool(numThreads){
             public void process(Object obj){
                 String row = (String) obj;
+
+                try{
+
+                    Columns columns = getColumns(row, header);
+                    for (javaxt.utils.Record record : getRecords(columns, localeMap)){
+                        Place place = (Place) record.get("place").toObject();
+                        ArrayList<Name> names = (ArrayList<Name>) record.get("names").toObject();
+
+
+                        savePlace(place, getPlaceQuery());
+
+                        for (Name name : names){
+                            try{
+                                Recordset rs = getRecordset(place, name);
+                                if (rs.EOF) rs.addNew();
+                                rs.setValue("name", name.getName());
+                                rs.setValue("uname", name.getUname());
+                                rs.setValue("type", name.getType());
+                                rs.setValue("language_code", name.getLanguageCode());
+                                rs.setValue("place_id", place.getID());
+                                rs.setValue("source_id", source.getID());
+                                rs.setValue("source_key", name.getSourceKey());
+                                rs.setValue("source_date", name.getSourceDate());
+                                rs.update();
+                                rs.close();
+                            }
+                            catch(Exception e){
+                                //console.log(e.getMessage());
+                            }
+                        }
+
+                    }
+
+                }
+                catch(Exception e){
+                    //e.printStackTrace();
+                }
                 counter.updateCount();
-
-
-              //Update column values
-                String[] col = row.split(delimiter, -1);
-                for (int i=0; i<col.length; i++){
-                    col[i] = col[i].trim();
-                    if (col[i].length()==0) col[i] = null;
-                }
-
-
-                //https://geonames.nga.mil/gns/html/gis_countryfiles.html
-
-
-              //Check whether to insert or skip the record
-                String fc = col[9].toUpperCase(); //Feature Class (e.g. P = Populated place)
-                String dsg = col[10].toUpperCase(); //Feature Designation Code. Read more http://www.geonames.org/export/codes.html
-                String[] type;
-                if (fc.equals("P") || fc.equals("L") || fc.equals("S")){
-                    type = typeMap.get(dsg);
-                    if (type==null) return;
-                }
-                else return;
-
-
-
-              //Parse fields
-                Long id = Long.parseLong(col[1]); //Unique Feature Identifier (UFI)
-                double latitude = Double.parseDouble(col[3]);
-                double longitude = Double.parseDouble(col[4]);
-                String countryCodes = col[12];
-                String a1 = col[13];
-                Integer pop = cint(col[14]);
-                int nameType = getNameType(col[17]);
-
-                String languageCode = col[18];
-                if (languageCode!=null){
-                    if (col[17].endsWith("S") && languageCode.equals("eng")){
-                        languageCode = null;
-                    }
-                }
-                Locale locale = localeMap.get(languageCode);
-                if (locale==null) locale = Locale.US;
-
-
-                int lastUpdate = cint(col[28].replace("-", "")); //2015-03-02 --> 20150302
-
-
-
-              //Set rank using the Feature Designation Code
-                int rank;
-
-                if (dsg.equals("PPLC")){ //capital of a political entity
-                    rank = 1;
-                }
-                else if (dsg.equals("PPLA")){ //seat of of a first-order administrative division (e.g. state capital)
-                    rank = 2;
-                }
-                else if (dsg.equals("PPLA2")){ //seat of of a second-order administrative division (e.g. county)
-                    rank = 3;
-                }
-                else if (dsg.equals("PPLA3")){ //seat of of a third-order administrative division
-                    rank = 4;
-                }
-                else{
-                    rank = 5;
-                }
-
-
-              //Update rank using the Display field
-                int minScale = 1;
-                String display = col[29];
-                if (display!=null){
-                    String[] arr = display.split(",");
-                    Integer x = cint(arr[arr.length-1]);
-                    if (x!=null) minScale = x;
-                }
-
-                if (rank==5){
-                    if (minScale==9) rank = 3;
-                }
-
-
-              //Update rank using the Populated Place Class - A numerical scale
-              //identifying the relative importance of a populated place. The
-              //scale ranges from 1 (high) to 5 (low).
-                Integer pc = cint(col[11]); //
-                if (pc!=null){
-                    if (pc<rank){
-                        if (pc==1 && !dsg.equals("PPLC")) pc=2;
-                        rank = pc;
-                    }
-                }
-
-
-                /*
-                //Update rank using population //<-- Population no longer maintained; contains no values
-                if (pop!=null && rank>3){
-                    if (pop>=150000){
-                        rank = 3;
-                    }
-                    else if (pop<150000 && pop>20000){
-                        rank = 4;
-                    }
-                }
-                */
-
-
-                for (String cc : countryCodes.split(",")){
-
-
-                  //Save place
-                    Place place = new Place();
-                    place.setCountryCode(cc);
-                    place.setAdmin1(a1);
-                    //updateUKTerritories(place);
-
-
-
-                    place.setGeom(geometryFactory.createPoint(new Coordinate(longitude, latitude)));
-                    place.setRank(rank);
-                    place.setSource(source);
-                    place.setSourceKey(id);
-                    place.setSourceDate(lastUpdate);
-
-                    if (type!=null){
-                        place.setType(type[0]);
-                        place.setSubtype(type[1]);
-                    }
-
-
-                    JSONObject json = new JSONObject();
-                    json.set("population", pop);
-                    json.set("dsg", dsg);
-                    json.set("fc", fc);
-                    json.set("pc", pc);
-                    json.set("note", col[27]);
-                    json.set("display", minScale);
-                    place.setInfo(json);
-
-
-
-                    String key = source.getID() + "|" + id + "|" + cc; ////source_id=? and source_key=? and country_code=?
-                    HashMap<String, Place> places = getPlaces();
-                    if (!places.containsKey(key)) places.put(key, place);
-
-                    HashMap<String, ArrayList<Name>> map = getNames();
-                    ArrayList<Name> names = map.get(key);
-                    if (names==null){
-                        names = new ArrayList<>();
-                        map.put(key, names);
-                    }
-
-
-
-                  //Add place names
-                    String name =    col[22]; //Full name
-                    String altName = col[23]; //Same as the full name but the character/diacritic combinations and special characters are substituted
-                                              //with QWERTY (visible U.S. English keyboard) characters while still maintaining casing and spaces.
-                                              //This field also includes non-roman script based names which are stripped of vowel markings.
-
-
-
-
-                    Name placeName = new Name();
-                    placeName.setName(name);
-                    placeName.setUname(name.toUpperCase(locale));
-                    placeName.setLanguageCode(languageCode);
-                    placeName.setType(nameType);
-                    placeName.setSource(source);
-                    placeName.setSourceKey(id);
-                    placeName.setSourceDate(lastUpdate);
-                    names.add(placeName);
-
-
-                    if (!name.equals(altName)){
-                        placeName = new Name();
-                        placeName.setName(altName);
-                        placeName.setUname(altName.toUpperCase(Locale.US));
-                        placeName.setLanguageCode("eng");
-                        placeName.setType(nameType);
-                        placeName.setSource(source);
-                        placeName.setSourceKey(id);
-                        placeName.setSourceDate(lastUpdate);
-                        names.add(placeName);
-                    }
-                }
             }
 
 
-
-            private HashMap<String, Place> getPlaces(){
-                HashMap<String, Place> places = (HashMap<String, Place>) get("places");
-                if (places==null){
-                    places = new HashMap<>();
-                    set("places", places);
-                }
-                return places;
-            }
-
-            private HashMap<String, ArrayList<Name>> getNames(){
-                HashMap<String, ArrayList<Name>> names = (HashMap<String, ArrayList<Name>>) get("names");
-                if (names==null){
-                    names = new HashMap<>();
-                    set("names", names);
-                }
-                return names;
-            }
-
-
-            public void exit(){
-                HashMap<String, Place> _places = getPlaces();
-                HashMap<String, ArrayList<Name>> _placeNames = getNames();
-                Iterator<String> it = _places.keySet().iterator();
-                while (it.hasNext()){
-                    String key = it.next();
-                    Place place = _places.get(key);
-                    ArrayList<Name> _names = _placeNames.get(key);
-
-                    synchronized(places){
-                        places.put(key, place);
-                    }
-
-                    synchronized(placeNames){
-                        ArrayList<Name> names = placeNames.get(key);
-                        if (names==null){
-                            names = new ArrayList<>();
-                            placeNames.put(key, names);
-                        }
-                        for (Name name : _names){
-                            names.add(name);
-                        }
-                    }
-                }
-            }
-        }.start();
-
-
-      //Parse file
-        BufferedReader br = getBufferedReader(file);
-        br.readLine(); //Skip header
-        String row;
-        while ((row = br.readLine()) != null){
-            pool.add(row);
-        }
-        br.close();
-
-        pool.done();
-        pool.join();
-
-
-        System.out.println("\nFound " + StringUtils.format(places.size()) + " unique places");
-
-
-        Counter x = new Counter(places.size());
-        pool = new ThreadPool(5, 10000){
-            public void process(Object obj){
-                Object[] arr = (Object[]) obj;
-                Place place = (Place) arr[0];
-                ArrayList<Name> names = (ArrayList<Name>) arr[1];
-                x.updateCount();
-
-
-
-                try{
-                    place.save();
-                }
-                catch(Exception e){
-                    if (e instanceof IllegalStateException){
-                        clear();
-                        return;
-                    }
-                    else{
-                        String msg = e.getMessage();
-                        if (msg.contains("duplicate key")){
-                            update(place);
-                        }
-                        else{
-                            console.log(e.getMessage());
-                        }
-                    }
-                }
-
-
-                for (Name name : names){
-                    try{
-                        Recordset rs = getRecordset(place, name);
-                        if (rs.EOF) rs.addNew();
-                        rs.setValue("name", name.getName());
-                        rs.setValue("uname", name.getUname());
-                        rs.setValue("type", name.getType());
-                        rs.setValue("language_code", name.getLanguageCode());
-                        rs.setValue("place_id", place.getID());
-                        rs.setValue("source_id", source.getID());
-                        rs.setValue("source_key", name.getSourceKey());
-                        rs.setValue("source_date", name.getSourceDate());
-                        rs.update();
-                        rs.close();
-                    }
-                    catch(Exception e){
-                        console.log(e.getMessage());
-                    }
-                }
-            }
-
-
-            private void update(Place place){
-                try{
-                    Long placeID = null;
-                    Integer currDate = null;
-                    PreparedStatement placeQuery = getPlaceQuery();
-                    placeQuery.setLong(1, source.getID());
-                    placeQuery.setLong(2, place.getSourceKey());
-                    placeQuery.setString(3, place.getCountryCode());
-                    java.sql.ResultSet r2 = placeQuery.executeQuery();
-                    while (r2.next()) {
-                        placeID = r2.getLong(1);
-                        currDate = r2.getInt(2);
-                    }
-                    r2.close();
-
-                    place.setID(placeID);
-
-                    int lastUpdate = place.getSourceDate();
-                    if (lastUpdate>currDate){
-                        ChangeRequest cr = new ChangeRequest();
-                        cr.setPlace(place);
-                        cr.setInfo(place.toJson());
-                        cr.save();
-                    }
-                }
-                catch(Exception e){
-                }
-            }
 
             private PreparedStatement getPlaceQuery() throws Exception {
                 PreparedStatement stmt = (PreparedStatement) get("stmt");
@@ -476,6 +181,7 @@ public class NGA {
                 return rs;
             }
 
+
             public void exit(){
                 PreparedStatement stmt = (PreparedStatement) get("stmt");
                 if (stmt!=null) try{stmt.close();}catch(Exception e){}
@@ -490,28 +196,244 @@ public class NGA {
                 if (conn!=null) conn.close();
             }
 
-            private void clear(){
-                List list = getQueue();
-                synchronized(list){
-                    list.clear();
-                    done();
-                }
-            }
 
         }.start();
 
 
-
-        Iterator<String> it = places.keySet().iterator();
-        while (it.hasNext()){
-            String key = it.next();
-            Place place = places.get(key);
-            ArrayList<Name> names = placeNames.remove(key);
-            pool.add(new Object[]{place, names});
+      //Parse file and add records to the pool
+        BufferedReader br = getBufferedReader(file);
+        String[] cols = br.readLine().split(delimiter, -1);
+        for (String col : cols) header.add(col.trim().toLowerCase());
+        String row;
+        while ((row = br.readLine()) != null){
+            pool.add(row);
         }
+        br.close();
 
         pool.done();
         pool.join();
+
+        counter.stop();
+    }
+
+
+  //**************************************************************************
+  //** getRecords
+  //**************************************************************************
+  /** Used to parse a row and return places and names. Each record will
+   *  contain a place and at least one name associated with the place.
+   */
+    private static ArrayList<javaxt.utils.Record> getRecords(Columns columns,
+        Map<String, Locale> localeMap) {
+
+        ArrayList<javaxt.utils.Record> records = new ArrayList<>();
+
+
+        //https://geonames.nga.mil/gns/html/gis_countryfiles.html
+
+
+      //Check whether to insert or skip the record
+        String fc = columns.get("fc").toString(); //Feature Class (e.g. P = Populated place)
+        if (fc==null) fc = ""; fc = fc.toUpperCase();
+        String dsg = columns.get("dsg").toString(); //Feature Designation Code. Read more http://www.geonames.org/export/codes.html
+        if (dsg==null) dsg = columns.get("desig_cd").toString();
+        if (dsg==null) dsg = ""; dsg = dsg.toUpperCase();
+        String[] type;
+        if (fc.equals("P") || fc.equals("L") || fc.equals("S")){
+            type = typeMap.get(dsg);
+            if (type==null) return records;
+        }
+        else return records;
+
+
+
+      //Parse fields
+        Long id = columns.get("ufi").toLong(); //Unique Feature Identifier (UFI)
+        Double latitude = columns.get("lat").toDouble();
+        if (latitude==null) latitude = columns.get("lat_dd").toDouble();
+        Double longitude = columns.get("long").toDouble();
+        if (longitude==null) longitude = columns.get("long_dd").toDouble();
+        String countryCodes = columns.get("cc1").toString();
+        String a1 = columns.get("adm1").toString();
+        if (countryCodes==null){
+            if (a1!=null && a1.contains("-")){
+                String[] arr = a1.split("-");
+                countryCodes = arr[0];
+                a1 = arr[1];
+                if (a1.length()>2) a1 = null;
+            }
+            else{
+                countryCodes = columns.get("cc_ft").toString();
+            }
+        }
+
+        Integer pop = columns.get("pop").toInteger();
+        String nt = columns.get("nt").toString();
+        int nameType = getNameType(nt);
+
+        String languageCode = columns.get("lc").toString();
+        languageCode = columns.get("lang_cd").toString();
+        if (languageCode!=null){
+            if (nt.endsWith("S") && languageCode.equals("eng")){
+                languageCode = null;
+            }
+        }
+        Locale locale = localeMap.get(languageCode);
+        if (locale==null) locale = Locale.US;
+
+
+        Integer lastUpdate = null;
+        String modDate = columns.get("modify_date").toString();
+        if (modDate!=null) lastUpdate = cint(modDate.replace("-", "")); //2015-03-02 --> 20150302
+        else{
+            try{
+                modDate = columns.get("mod_dt_ft").toString();
+                if (modDate!=null) lastUpdate =
+                cint(new javaxt.utils.Date(modDate).toString("yyyyMMdd", "UTC"));
+            }
+            catch(Exception e){}
+        }
+
+
+
+      //Set rank using the Feature Designation Code
+        int rank;
+
+        if (dsg.equals("PPLC")){ //capital of a political entity
+            rank = 1;
+        }
+        else if (dsg.equals("PPLA")){ //seat of of a first-order administrative division (e.g. state capital)
+            rank = 2;
+        }
+        else if (dsg.equals("PPLA2")){ //seat of of a second-order administrative division (e.g. county)
+            rank = 3;
+        }
+        else if (dsg.equals("PPLA3")){ //seat of of a third-order administrative division
+            rank = 4;
+        }
+        else{
+            rank = 5;
+        }
+
+
+      //Update rank using the Display field
+        int minScale = 1;
+        String display = columns.get("display").toString();
+        if (display!=null){
+            String[] arr = display.split(",");
+            Integer x = cint(arr[arr.length-1]);
+            if (x!=null) minScale = x;
+        }
+
+        if (rank==5){
+            if (minScale==9) rank = 3;
+        }
+
+
+      //Update rank using the Populated Place Class - A numerical scale
+      //identifying the relative importance of a populated place. The
+      //scale ranges from 1 (high) to 5 (low).
+        Integer pc = columns.get("pc").toInteger(); //
+        if (pc==null) pc = columns.get("name_rank").toInteger(); //
+        if (pc!=null){
+            if (pc<rank){
+                if (pc==1 && !dsg.equals("PPLC")) pc=2;
+                rank = pc;
+            }
+        }
+
+
+        /*
+        //Update rank using population //<-- Population no longer maintained; contains no values
+        if (pop!=null && rank>3){
+            if (pop>=150000){
+                rank = 3;
+            }
+            else if (pop<150000 && pop>20000){
+                rank = 4;
+            }
+        }
+        */
+
+
+
+      //Parse names
+        String fullName = columns.get("full_name_ro").toString(); //col[22];
+        if (fullName==null) fullName = columns.get("full_nm_nd").toString();
+
+        String altName = columns.get("full_name_nd_ro").toString(); //col[23];
+        //Same as the full name but the character/diacritic combinations and special characters are substituted
+        //with QWERTY (visible U.S. English keyboard) characters while still maintaining casing and spaces.
+        //This field also includes non-roman script based names which are stripped of vowel markings.
+
+
+
+      //Create records
+        for (String cc : countryCodes.split(",")){
+
+
+          //Save place
+            Place place = new Place();
+            place.setCountryCode(cc);
+            place.setAdmin1(a1);
+            //updateUKTerritories(place);
+
+
+
+            place.setGeom(geometryFactory.createPoint(new Coordinate(longitude, latitude)));
+            place.setRank(rank);
+            place.setSource(source);
+            place.setSourceKey(id);
+            place.setSourceDate(lastUpdate);
+
+            if (type!=null){
+                place.setType(type[0]);
+                place.setSubtype(type[1]);
+            }
+
+
+            JSONObject json = new JSONObject();
+            json.set("population", pop);
+            json.set("dsg", dsg);
+            json.set("fc", fc);
+            json.set("pc", pc);
+            json.set("note", columns.get("note").toString());
+            json.set("display", minScale);
+            place.setInfo(json);
+
+
+            ArrayList<Name> names = new ArrayList<>();
+            Name placeName = new Name();
+            placeName.setName(fullName);
+            placeName.setUname(fullName.toUpperCase(locale));
+            placeName.setLanguageCode(languageCode);
+            placeName.setType(nameType);
+            placeName.setSource(source);
+            placeName.setSourceKey(id);
+            placeName.setSourceDate(lastUpdate);
+            names.add(placeName);
+
+
+            if (altName!=null && !fullName.equals(altName)){
+                placeName = new Name();
+                placeName.setName(altName);
+                placeName.setUname(altName.toUpperCase(Locale.US));
+                placeName.setLanguageCode("eng");
+                placeName.setType(nameType);
+                placeName.setSource(source);
+                placeName.setSourceKey(id);
+                placeName.setSourceDate(lastUpdate);
+                names.add(placeName);
+            }
+
+
+            javaxt.utils.Record record = new javaxt.utils.Record();
+            record.set("place", place);
+            record.set("names", names);
+            records.add(record);
+        }
+
+        return records;
     }
 
 
@@ -665,9 +587,11 @@ public class NGA {
   //** download
   //**************************************************************************
   /** Used to download the "Entire country files dataset" from the NGA website:
-   *  http://geonames.nga.mil/gns/html/namefiles.html
+   *  https://geonames.nga.mil/geonames/GNSData/
    */
     public static File download(Directory downloadDir, boolean unzip) throws Exception {
+
+        /*
         java.net.URL url = new java.net.URL("https://geonames.nga.mil/gns/html/namefiles.html");
         javaxt.http.Response response = new javaxt.http.Request(url).getResponse();
         if (response.getStatus()!=200) throw new Exception("Failed to connect to " + url);
@@ -695,17 +619,61 @@ public class NGA {
                 break;
             }
         }
+        */
+
+
+      //Set output file name
+        String fileName = "geonames";
+        String fileExt = "zip";
+
+
+      //Append date using last update from one of the RSS links
+        javaxt.http.Response response = new javaxt.http.Request(
+        "https://geonames.nga.mil/geonames/GNSData/RSS/ZWE.xml").getResponse();
+        if (response.getStatus()==200){
+            org.w3c.dom.Document xml = response.getXML();
+            for (org.w3c.dom.Node node : javaxt.xml.DOM.getElementsByTagName("pubDate", xml)){
+                try{
+                    javaxt.utils.Date date = new javaxt.utils.Date(javaxt.xml.DOM.getNodeValue(node));
+                    fileName += "_"+date.toString("yyyyMMdd", "UTC");
+                    break;
+                }
+                catch(Exception e){
+                    e.printStackTrace();
+                }
+            }
+        }
 
 
 
+      //Set download link
+        java.net.URL link = new java.net.URL("https://geonames.nga.mil/geonames/GNSData/fc_files/Populated_Places.zip");
+        //java.net.URL link = new java.net.URL("https://geonames.nga.mil/geonames/GNSData/fc_files/Whole_World.7z");
+        //fileExt = "7z";
+
+
+
+      //Download file
+        File file = new File(downloadDir + "nga/" + fileName + "." + fileExt);
+        if (!file.exists()){
+            response = new javaxt.http.Request(link).getResponse();
+            if (response.getStatus()!=200) throw new Exception("Failed to download " + link);
+            System.out.print("Downloading " + file + "...");
+            try (java.io.InputStream is = response.getInputStream()){
+                file.write(is);
+            }
+            System.out.println("Done!");
+        }
         if (file==null) throw new Exception("Failed to find file to download");
 
+
+      //Unzip as needed
         if (unzip){
             File countryFile = new File(file.getDirectory(), file.getName(false) + ".txt");
             ZipInputStream zip = new ZipInputStream(file.getInputStream());
             ZipEntry entry;
             while((entry = zip.getNextEntry())!=null){
-                String fileName = entry.getName();
+                fileName = entry.getName();
                 if (fileName.equalsIgnoreCase("Countries.txt")){
                     byte[] buffer = new byte[2048];
                     java.io.FileOutputStream output = countryFile.getOutputStream();
@@ -738,7 +706,9 @@ public class NGA {
             while ((zipEntry = zip.getNextEntry()) != null) {
                 if (!zipEntry.isDirectory()) {
                     final String fileName = zipEntry.getName();
-                    if (fileName.equalsIgnoreCase("Countries.txt")){
+                    if (fileName.equalsIgnoreCase("Countries.txt")||
+                        fileName.equalsIgnoreCase("Whole_World.txt")||
+                        fileName.equalsIgnoreCase("Populated_Places.txt")){
                         InputStream is = zipFile.getInputStream(zipEntry);
                         return new BufferedReader(new InputStreamReader(is, "UTF-8"));
                     }
@@ -751,6 +721,68 @@ public class NGA {
         return null;
     }
 
+
+  //**************************************************************************
+  //** getColumns
+  //**************************************************************************
+    private static Columns getColumns(String row, ArrayList<String> header){
+        HashMap<String, javaxt.utils.Value> columns = new HashMap<>();
+        String[] cols = row.split(delimiter, -1);
+        for (int i=0; i<cols.length; i++){
+            String col = cols[i].trim();
+            if (col.length()==0) col = null;
+            columns.put(header.get(i), new javaxt.utils.Value(col));
+        }
+        return new Columns(columns);
+    }
+
+    private static class Columns{
+        private HashMap<String, javaxt.utils.Value> columns;
+        public Columns(HashMap<String, javaxt.utils.Value> columns){
+            this.columns = columns;
+        }
+        public javaxt.utils.Value get(String key){
+            javaxt.utils.Value v = columns.get(key);
+            if (v==null) v = new javaxt.utils.Value(null);
+            return v;
+        }
+    }
+
+  //**************************************************************************
+  //** savePlace
+  //**************************************************************************
+    private static synchronized void savePlace(Place place,
+        PreparedStatement placeQuery) throws Exception {
+
+        Long placeID = null;
+        Integer currDate = null;
+
+        placeQuery.setLong(1, place.getSource().getID());
+        placeQuery.setLong(2, place.getSourceKey());
+        placeQuery.setString(3, place.getCountryCode());
+        java.sql.ResultSet r2 = placeQuery.executeQuery();
+        while (r2.next()) {
+            placeID = r2.getLong(1);
+            currDate = r2.getInt(2);
+        }
+        r2.close();
+
+
+        if (placeID==null){
+            place.save();
+        }
+        else{
+            place.setID(placeID);
+
+            Integer lastUpdate = place.getSourceDate();
+            if (lastUpdate>currDate){
+                ChangeRequest cr = new ChangeRequest();
+                cr.setPlace(place);
+                cr.setInfo(place.toJson());
+                cr.save();
+            }
+        }
+    }
 
   //**************************************************************************
   //** downloadUpdates
