@@ -127,7 +127,7 @@ public class Config {
 
 
               //Initialize models
-                javaxt.io.Jar jar = (javaxt.io.Jar) config.get("jar").toObject();
+                javaxt.io.Jar jar = new javaxt.io.Jar(Main.class);
                 Model.init(jar, database.getConnectionPool());
 
 

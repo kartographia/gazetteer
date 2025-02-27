@@ -1,5 +1,4 @@
 package com.kartographia.gazetteer;
-import com.kartographia.gazetteer.utils.*;
 import com.kartographia.gazetteer.source.*;
 
 import java.util.*;
@@ -8,7 +7,7 @@ import javaxt.io.*;
 import javaxt.sql.*;
 import javaxt.express.*;
 import static javaxt.utils.Console.console;
-
+import static javaxt.express.utils.StringUtils.*;
 
 
 //******************************************************************************
@@ -103,7 +102,7 @@ public class Main {
                         }
 
                         System.out.println();
-                        System.out.println("Ellapsed Time: " + StringUtils.getElapsedTime(startTime));
+                        System.out.println("Ellapsed Time: " + getElapsedTime(startTime));
                     }
                     catch(Exception e){
                         try{ br.close(); } catch(Exception ex){}
