@@ -1,263 +1,289 @@
-CC,Name,ISO_Code,Region,Latitude,Longitude
-AG,Algeria,DZ,Africa,28.033886,1.659626
-AO,Angola,AO,Africa,-11.202692,17.873887
-BS,Bassas da India,TF,Africa,,
-BN,Benin,BJ,Africa,9.30769,2.315834
-BC,Botswana,BW,Africa,-22.328474,24.684866
-UV,Burkina Faso,BF,Africa,12.238333,-1.561593
-BY,Burundi,BI,Africa,-3.373056,29.918886
-CM,Cameroon,CM,Africa,7.369722,12.354722
-CV,Cape Verde,CV,Africa,16.002082,-24.013197
-CT,Central African Republic,CF,Africa,6.611111,20.939444
-CD,Chad,TD,Africa,15.454166,18.732207
-CN,Comoros,KM,Africa,-11.875001,43.872219
-CF,Congo,CG,Africa,-0.228021,15.827659
-DJ,Djibouti,DJ,Africa,11.825138,42.590275
-CG,DR Congo,CD,Africa,-4.038333,21.758664
-EK,Equatorial Guinea,GQ,Africa,1.650801,10.267895
-ER,Eritrea,ER,Africa,15.179384,39.782334
-ET,Ethiopia,ET,Africa,9.145,40.489673
-EU,Europa Island,TF,Africa,,
-GB,Gabon,GA,Africa,-0.803689,11.609444
-GA,Gambia,GM,Africa,13.443182,-15.310139
-GH,Ghana,GH,Africa,7.946527,-1.023194
-GO,Glorioso Islands,TF,Africa,,
-GV,Guinea,GN,Africa,9.945587,-9.696645
-PU,Guinea-Bissau,GW,Africa,11.803749,-15.180413
-IV,Ivory Coast,CI,Africa,7.539989,-5.54708
-JU,Juan de Nova Island,TF,Africa,,
-KE,Kenya,KE,Africa,-0.023559,37.906193
-LT,Lesotho,LS,Africa,-29.609988,28.233608
-LI,Liberia,LR,Africa,6.428055,-9.429499
-LY,Libya,LY,Africa,26.3351,17.228331
-MA,Madagascar,MG,Africa,-18.766947,46.869107
-MI,Malawi,MW,Africa,-13.254308,34.301525
-ML,Mali,ML,Africa,17.570692,-3.996166
-MR,Mauritania,MR,Africa,21.00789,-10.940835
-MP,Mauritius,MU,Africa,-20.348404,57.552152
-MF,Mayotte,FR,Africa,,
-MO,Morocco,MA,Africa,31.791702,-7.09262
-MZ,Mozambique,MZ,Africa,-18.665695,35.529562
-WA,Namibia,NA,Africa,-22.95764,18.49041
-NG,Niger,NE,Africa,17.607789,8.081666
-NI,Nigeria,NG,Africa,9.081999,8.675277
-RE,Reunion,RE,Africa,,
-RW,Rwanda,RW,Africa,-1.940278,29.873888
-SH,Saint Helena,SH,Africa,-24.143474,-10.030696
-TP,Sao Tome and Principe,ST,Africa,0.18636,6.613081
-SG,Senegal,SN,Africa,14.497401,-14.452362
-SE,Seychelles,SC,Africa,-4.679574,55.491977
-SL,Sierra Leone,SL,Africa,8.460555,-11.779889
-SO,Somalia,SO,Africa,5.152149,46.199616
-SF,South Africa,ZA,Africa,-30.559482,22.937506
-OD,South Sudan,SS,Africa,6.877,31.307
-SU,Sudan,SD,Africa,12.862807,30.217636
-WZ,Swaziland,SZ,Africa,-26.522503,31.465866
-TZ,Tanzania,TZ,Africa,-6.369028,34.888822
-TO,Togo,TG,Africa,8.619543,0.824782
-TE,Tromelin Island,TF,Africa,,
-TS,Tunisia,TN,Africa,33.886917,9.537499
-UG,Uganda,UG,Africa,1.373333,32.290275
-WI,Western Sahara,EH,Africa,24.215527,-12.885834
-ZA,Zambia,ZM,Africa,-13.133897,27.849332
-ZI,Zimbabwe,ZW,Africa,-19.015438,29.154857
-AY,Antarctica,AQ,Antarctic,-75.250973,-0.071389
-BV,Bouvet Island,BV,Antarctic,,
-FS,French Southern Territories,TF,Antarctic,-49.280366,69.348557
-HM,Heard Island and McDonald Islands,HM,Antarctic,-53.08181,73.504158
-AF,Afghanistan,AF,Asia,33.93911,67.709953
-AM,Armenia,AM,Asia,40.069099,45.038189
-AT,Ashmore and Cartier,,Asia,,
-AJ,Azerbaijan,AZ,Asia,40.143105,47.576927
-BG,Bangladesh,BD,Asia,23.684994,90.356331
-BT,Bhutan,BT,Asia,27.514162,90.433601
-IO,British Indian Ocean Territory,IO,Asia,-6.343194,71.876519
-BX,Brunei,BN,Asia,4.535277,114.727669
-CB,Cambodia,KH,Asia,12.565679,104.990963
-CH,China,CN,Asia,35.86166,104.195397
-KT,Christmas Island,AU,Asia,,
-CK,Cocos Islands,CC,Asia,,
-GG,Georgia,GE,Asia,42.315407,43.356892
-HK,Hong Kong,HK,Asia,22.396428,114.109497
-IN,India,IN,Asia,20.593684,78.96288
-ID,Indonesia,ID,Asia,-0.789275,113.921327
-JA,Japan,JP,Asia,36.204824,138.252924
-KZ,Kazakhstan,KZ,Asia,48.019573,66.923684
-KG,Kyrgyzstan,KG,Asia,41.20438,74.766098
-LA,Laos,LA,Asia,19.85627,102.495496
-MC,Macao,MO,Asia,22.198745,113.543873
-MY,Malaysia,MY,Asia,4.210484,101.975766
-MV,Maldives,MV,Asia,3.202778,73.22068
-MG,Mongolia,MN,Asia,46.862496,103.846656
-BM,Myanmar,MM,Asia,21.913965,95.956223
-NP,Nepal,NP,Asia,28.394857,84.124008
-KN,North Korea,KP,Asia,40.339852,127.510093
-PK,Pakistan,PK,Asia,30.375321,69.345116
-PF,Paracel Islands,CN,Asia,,
-RP,Philippines,PH,Asia,12.879721,121.774017
-SN,Singapore,SG,Asia,1.352083,103.819836
-KS,South Korea,KR,Asia,35.907757,127.766922
-PG,Spratly Islands,CN,Asia,,
-CE,Sri Lanka,LK,Asia,7.873054,80.771797
-TW,Taiwan,TW,Asia,23.69781,120.960515
-TI,Tajikistan,TJ,Asia,38.861034,71.276093
-TH,Thailand,TH,Asia,15.870032,100.992541
-TT,Timor-Leste,TL,Asia,-8.874217,125.727539
-TX,Turkmenistan,TM,Asia,38.969719,59.556278
-UZ,Uzbekistan,UZ,Asia,41.377491,64.585262
-VM,Vietnam,VN,Asia,14.058324,108.277199
-AV,Anguilla,AI,Caribbean,18.220554,-63.068615
-AC,Antigua and Barbuda,AG,Caribbean,17.060816,-61.796428
-AA,Aruba,AW,Caribbean,12.52111,-69.968338
-BF,Bahamas,BS,Caribbean,25.03428,-77.39628
-BB,Barbados,BB,Caribbean,13.193887,-59.543198
-,British Virgin Islands,VG,Caribbean,18.420695,-64.639968
-CJ,Cayman Islands,KY,Caribbean,19.513469,-80.566956
-CU,Cuba,CU,Caribbean,21.521757,-77.781167
-UC,Curacao,CW,Caribbean,12.1696,-68.99
-DO,Dominica,DM,Caribbean,15.414999,-61.370976
-DR,Dominican Republic,DO,Caribbean,18.735693,-70.162651
-GJ,Grenada,GD,Caribbean,12.262776,-61.604171
-GP,Guadeloupe,GP,Caribbean,,
-HA,Haiti,HT,Caribbean,18.971187,-72.285215
-JM,Jamaica,JM,Caribbean,18.109581,-77.297508
-MB,Martinique,FR,Caribbean,,
-MH,Montserrat,MS,Caribbean,16.742498,-62.187366
-RQ,Puerto Rico,PR,Caribbean,18.220833,-66.590149
-TB,Saint Barts,BL,Caribbean,17.9,-62.8333
-SC,Saint Kitts and Nevis,KN,Caribbean,17.357822,-62.782998
-ST,Saint Lucia,LC,Caribbean,13.909444,-60.978893
-RN,Saint Martin,MF,Caribbean,18.0708,-63.0501
-VC,Saint Vincent and the Grenadines,VC,Caribbean,12.984305,-61.287228
-NN,Sint Maarten,SX,Caribbean,18.08186277,-63.04730179
-TD,Trinidad and Tobago,TT,Caribbean,10.691803,-61.222503
-TK,Turks and Caicos Islands,TC,Caribbean,21.694025,-71.797928
-VI,US Virgin Islands,VI,Caribbean,18.335765,-64.896335
-BH,Belize,BZ,Central America,17.189877,-88.49765
-CS,Costa Rica,CR,Central America,9.748917,-83.753428
-ES,El Salvador,SV,Central America,13.794185,-88.89653
-GT,Guatemala,GT,Central America,15.783471,-90.230759
-HO,Honduras,HN,Central America,15.199999,-86.241905
-NU,Nicaragua,NI,Central America,12.865416,-85.207229
-PM,Panama,PA,Central America,8.537981,-80.782127
-FI,Aland Islands,AX,Europe,60.1785,19.9156
-AL,Albania,AL,Europe,41.153332,20.168331
-AN,Andorra,AD,Europe,42.546245,1.601554
-AU,Austria,AT,Europe,47.516231,14.550072
-BO,Belarus,BY,Europe,53.709807,27.953389
-BE,Belgium,BE,Europe,50.503887,4.469936
-BK,Bosnia and Herzegovina,BA,Europe,43.915886,17.679076
-BU,Bulgaria,BG,Europe,42.733883,25.48583
-HR,Croatia,HR,Europe,45.1,15.2
-EZ,Czech Republic,CZ,Europe,49.817492,15.472962
-DA,Denmark,DK,Europe,56.26392,9.501785
-EN,Estonia,EE,Europe,58.595272,25.013607
-FO,Faroe Islands,FO,Europe,61.892635,-6.911806
-FI,Finland,FI,Europe,61.92411,25.748151
-FR,France,FR,Europe,46.227638,2.213749
-GM,Germany,DE,Europe,51.165691,10.451526
-GI,Gibraltar,GI,Europe,36.1409568,-5.354056367
-GR,Greece,GR,Europe,39.074208,21.824312
-GK,Guernsey,GG,Europe,49.465691,-2.585278
-HU,Hungary,HU,Europe,47.162494,19.503304
-IC,Iceland,IS,Europe,64.963051,-19.020835
-EI,Ireland,IE,Europe,53.41291,-8.24389
-IM,Isle of Man,IM,Europe,54.236107,-4.548056
-IT,Italy,IT,Europe,41.87194,12.56738
-JN,Jan Mayen,SJ,Europe,71.03415355,-8.2859056
-JE,Jersey,JE,Europe,49.214439,-2.13125
-KV,Kosovo,XK,Europe,42.602636,20.902977
-LG,Latvia,LV,Europe,56.879635,24.603189
-LS,Liechtenstein,LI,Europe,47.166,9.555373
-LH,Lithuania,LT,Europe,55.169438,23.881275
-LU,Luxembourg,LU,Europe,49.815273,6.129583
-MK,Macedonia,MK,Europe,41.608635,21.745275
-MT,Malta,MT,Europe,35.937496,14.375416
-MD,Moldova,MD,Europe,47.411631,28.369885
-MN,Monaco,MC,Europe,43.750298,7.412841
-MJ,Montenegro,ME,Europe,42.708678,19.37439
-NL,Netherlands,NL,Europe,52.132633,5.291266
-NO,Norway,NO,Europe,60.472024,8.468946
-PL,Poland,PL,Europe,51.919438,19.145136
-PO,Portugal,PT,Europe,39.399872,-8.224454
-RO,Romania,RO,Europe,45.943161,24.96676
-RS,Russia,RU,Europe,61.52401,105.318756
-SM,San Marino,SM,Europe,43.94236,12.457777
-RI,Serbia,RS,Europe,44.016521,21.005859
-LO,Slovakia,SK,Europe,48.669026,19.699024
-SI,Slovenia,SI,Europe,46.151241,14.995463
-SP,Spain,ES,Europe,40.463667,-3.74922
-SV,Svalbard,SJ,Europe,78.19308295,17.06032752
-SW,Sweden,SE,Europe,60.128161,18.643501
-SZ,Switzerland,CH,Europe,46.818188,8.227512
-UP,Ukraine,UA,Europe,48.379433,31.16558
-UK,United Kingdom,GB,Europe,55.378051,-3.435973
-VT,Vatican City,VA,Europe,41.902916,12.453389
-AX,Akrotiri,GB,Middle East,34.59066874,32.9873126
-BA,Bahrain,BH,Middle East,25.930414,50.637772
-CY,Cyprus,CY,Middle East,35.126413,33.429859
-DX,Dhekelia,GB,Middle East,34.99504613,33.81523533
-EG,Egypt,EG,Middle East,26.820553,30.802498
-IR,Iran,IR,Middle East,32.427908,53.688046
-IZ,Iraq,IQ,Middle East,33.223191,43.679291
-IS,Israel,IL,Middle East,31.046051,34.851612
-JO,Jordan,JO,Middle East,30.585164,36.238414
-KU,Kuwait,KW,Middle East,29.31166,47.481766
-LE,Lebanon,LB,Middle East,33.854721,35.862285
-TU,North Cyprus,TR,Middle East,35.19882304,33.61410378
-MU,Oman,OM,Middle East,21.512583,55.923255
-PT,Palestinian Territory,PS,Middle East,31.952162,35.233154
-QA,Qatar,QA,Middle East,25.354826,51.183884
-SA,Saudi Arabia,SA,Middle East,23.885942,45.079162
-SY,Syria,SY,Middle East,34.802075,38.996815
-TU,Turkey,TR,Middle East,38.963745,35.243322
-AE,United Arab Emirates,AE,Middle East,23.424076,53.847818
-YM,Yemen,YE,Middle East,15.552727,48.516388
-BD,Bermuda,BM,North America,32.321384,-64.75737
-CA,Canada,CA,North America,56.130366,-106.346771
-GL,Greenland,GL,North America,71.706936,-42.604303
-MX,Mexico,MX,North America,23.634501,-102.552784
-SB,Saint Pierre and Miquelon,PM,North America,46.941936,-56.27111
-US,United States,US,North America,37.09024,-95.712891
-AQ,American Samoa,AS,Oceania,-14.270972,-170.132217
-AS,Australia,AU,Oceania,-25.274398,133.775136
-IP,Clipperton Island,FR,Oceania,,
-CW,Cook Islands,CK,Oceania,-21.236736,-159.777671
-CR,Coral Sea Islands,AU,Oceania,,
-FJ,Fiji,FJ,Oceania,-16.578193,179.414413
-FP,French Polynesia,PF,Oceania,-17.679742,-149.406843
-GQ,Guam,GU,Oceania,13.444304,144.793731
-KR,Kiribati,KI,Oceania,-3.370417,-168.734039
-RM,Marshall Islands,MH,Oceania,7.131474,171.184478
-FM,Micronesia,FM,Oceania,7.425554,150.550812
-NR,Nauru,NR,Oceania,-0.522778,166.931503
-NC,New Caledonia,NC,Oceania,-20.904305,165.618042
-NZ,New Zealand,NZ,Oceania,-40.900557,174.885971
-NE,Niue,NU,Oceania,-19.054445,-169.867233
-NF,Norfolk Island,NF,Oceania,-29.040835,167.954712
-CQ,Northern Mariana Islands,MP,Oceania,17.33083,145.38469
-PS,Palau,PW,Oceania,7.51498,134.58252
-PP,Papua New Guinea,PG,Oceania,-6.314993,143.95555
-PC,Pitcairn,PN,Oceania,-24.703615,-127.439308
-WS,Samoa,WS,Oceania,-13.759029,-172.104629
-BP,Solomon Islands,SB,Oceania,-9.64571,160.156194
-TL,Tokelau,NZ,Oceania,,
-TN,Tonga,TO,Oceania,-21.178986,-175.198242
-TV,Tuvalu,GB,Oceania,,
-NH,Vanuatu,VU,Oceania,-15.376706,166.959158
-WF,Wallis and Futuna,WF,Oceania,-13.768752,-177.156097
-AR,Argentina,AR,South America,-38.416097,-63.616672
-BL,Bolivia,BO,South America,-16.290154,-63.588653
-BR,Brazil,BR,South America,-14.235004,-51.92528
-CI,Chile,CL,South America,-35.675147,-71.542969
-CO,Colombia,CO,South America,4.570868,-74.297333
-EC,Ecuador,EC,South America,-1.831239,-78.183406
-FK,Falkland Islands,FK,South America,-51.796253,-59.523613
-FG,French Guiana,GF,South America,,
-GY,Guyana,GY,South America,4.860416,-58.93018
-PA,Paraguay,PY,South America,-23.442503,-58.443832
-PE,Peru,PE,South America,-9.189967,-75.015152
-SX,South Georgia and South Sandwich Islands,GS,South America,-54.429579,-36.587909
-NS,Suriname,SR,South America,3.919305,-56.027783
-UY,Uruguay,UY,South America,-32.522779,-55.765835
-VE,Venezuela,VE,South America,6.42375,-66.58973
+ISO2,ISO3,FIPS,Name,Admin,Region,Latitude,Longitude
+DZ,DZA,AG,Algeria,DZ,Africa,28.033886,1.659626
+AO,AGO,AO,Angola,AO,Africa,-11.202692,17.873887
+,,BS,Bassas da India,TF,Africa,-21.4757362,39.6999685
+BJ,BEN,BN,Benin,BJ,Africa,9.30769,2.315834
+BW,BWA,BC,Botswana,BW,Africa,-22.328474,24.684866
+BF,BFA,UV,Burkina Faso,BF,Africa,12.238333,-1.561593
+BI,BDI,BY,Burundi,BI,Africa,-3.373056,29.918886
+CM,CMR,CM,Cameroon,CM,Africa,7.369722,12.354722
+CV,CPV,CV,Cape Verde,CV,Africa,16.002082,-24.013197
+CF,CAF,CT,Central African Republic,CF,Africa,6.611111,20.939444
+TD,TCD,CD,Chad,TD,Africa,15.454166,18.732207
+KM,COM,CN,Comoros,KM,Africa,-11.875001,43.872219
+CG,COG,CF,Congo,CG,Africa,-0.228021,15.827659
+DJ,DJI,DJ,Djibouti,DJ,Africa,11.825138,42.590275
+CD,COD,CG,DR Congo,CD,Africa,-4.038333,21.758664
+GQ,GNQ,EK,Equatorial Guinea,GQ,Africa,1.650801,10.267895
+ER,ERI,ER,Eritrea,ER,Africa,15.179384,39.782334
+ET,ETH,ET,Ethiopia,ET,Africa,9.145,40.489673
+,,EU,Europa Island,TF,Africa,-22.3726969,40.3471188
+GA,GAB,GB,Gabon,GA,Africa,-0.803689,11.609444
+GM,GMB,GA,Gambia,GM,Africa,13.443182,-15.310139
+GH,GHA,GH,Ghana,GH,Africa,7.946527,-1.023194
+,,GO,Glorioso Islands,TF,Africa,-11.5800781,47.2971884
+GN,GIN,GV,Guinea,GN,Africa,9.945587,-9.696645
+GW,GNB,PU,Guinea-Bissau,GW,Africa,11.803749,-15.180413
+CI,CIV,IV,Ivory Coast,CI,Africa,7.539989,-5.54708
+,,JU,Juan de Nova Island,TF,Africa,-17.0543691,42.7216628
+KE,KEN,KE,Kenya,KE,Africa,-0.023559,37.906193
+LS,LSO,LT,Lesotho,LS,Africa,-29.609988,28.233608
+LR,LBR,LI,Liberia,LR,Africa,6.428055,-9.429499
+LY,LBY,LY,Libya,LY,Africa,26.3351,17.228331
+MG,MDG,MA,Madagascar,MG,Africa,-18.766947,46.869107
+MW,MWI,MI,Malawi,MW,Africa,-13.254308,34.301525
+ML,MLI,ML,Mali,ML,Africa,17.570692,-3.996166
+MR,MRT,MR,Mauritania,MR,Africa,21.00789,-10.940835
+MU,MUS,MP,Mauritius,MU,Africa,-20.348404,57.552152
+YT,MYT,MF,Mayotte,FR,Africa,-12.8072902,45.1122645
+MA,MAR,MO,Morocco,MA,Africa,31.791702,-7.09262
+MZ,MOZ,MZ,Mozambique,MZ,Africa,-18.665695,35.529562
+NA,NAM,WA,Namibia,NA,Africa,-22.95764,18.49041
+NE,NER,NG,Niger,NE,Africa,17.607789,8.081666
+NG,NGA,NI,Nigeria,NG,Africa,9.081999,8.675277
+RE,REU,RE,Reunion,RE,Africa,-21.1314672,55.4947291
+RW,RWA,RW,Rwanda,RW,Africa,-1.940278,29.873888
+SH,SHN,SH,Saint Helena,SH,Africa,-24.143474,-10.030696
+ST,STP,TP,Sao Tome and Principe,ST,Africa,0.18636,6.613081
+SN,SEN,SG,Senegal,SN,Africa,14.497401,-14.452362
+SC,SYC,SE,Seychelles,SC,Africa,-4.679574,55.491977
+SL,SLE,SL,Sierra Leone,SL,Africa,8.460555,-11.779889
+SO,SOM,SO,Somalia,SO,Africa,5.152149,46.199616
+ZA,ZAF,SF,South Africa,ZA,Africa,-30.559482,22.937506
+SS,SSD,OD,South Sudan,SS,Africa,6.877,31.307
+SD,SDN,SU,Sudan,SD,Africa,12.862807,30.217636
+SZ,SWZ,WZ,Swaziland,SZ,Africa,-26.522503,31.465866
+TZ,TZA,TZ,Tanzania,TZ,Africa,-6.369028,34.888822
+TG,TGO,TO,Togo,TG,Africa,8.619543,0.824782
+,,TE,Tromelin Island,TF,Africa,-15.8916337,54.521473
+TN,TUN,TS,Tunisia,TN,Africa,33.886917,9.537499
+UG,UGA,UG,Uganda,UG,Africa,1.373333,32.290275
+EH,ESH,WI,Western Sahara,EH,Africa,24.215527,-12.885834
+ZM,ZMB,ZA,Zambia,ZM,Africa,-13.133897,27.849332
+ZW,ZWE,ZI,Zimbabwe,ZW,Africa,-19.015438,29.154857
+AQ,ATA,AY,Antarctica,AQ,Antarctic,-75.250973,-0.071389
+BV,BVT,BV,Bouvet Island,BV,Antarctic,-54.4224307,3.3386805
+TF,ATF,FS,French Southern Territories,TF,Antarctic,-49.280366,69.348557
+HM,HMD,HM,Heard Island and McDonald Islands,HM,Antarctic,-53.08181,73.504158
+AF,AFG,AF,Afghanistan,AF,Asia,33.93911,67.709953
+AM,ARM,AM,Armenia,AM,Asia,40.069099,45.038189
+XA,XAC,AT,Ashmore and Cartier,AU,Asia,,
+AZ,AZE,AJ,Azerbaijan,AZ,Asia,40.143105,47.576927
+BD,BGD,BG,Bangladesh,BD,Asia,23.684994,90.356331
+BT,BTN,BT,Bhutan,BT,Asia,27.514162,90.433601
+IO,IOT,IO,British Indian Ocean Territory,GB,Asia,-6.343194,71.876519
+BN,BRN,BX,Brunei,BN,Asia,4.535277,114.727669
+KH,KHM,CB,Cambodia,KH,Asia,12.565679,104.990963
+CN,CHN,CH,China,CN,Asia,35.86166,104.195397
+CX,CXR,KT,Christmas Island,AU,Asia,-10.4915886,105.620918
+CC,CCK,CK,Cocos Islands,CC,Asia,-12.1936319,96.8377986
+GE,GEO,GG,Georgia,GE,Asia,42.315407,43.356892
+HK,HKG,HK,Hong Kong,HK,Asia,22.396428,114.109497
+IN,IND,IN,India,IN,Asia,20.593684,78.96288
+ID,IDN,ID,Indonesia,ID,Asia,-0.789275,113.921327
+JP,JPN,JA,Japan,JP,Asia,36.204824,138.252924
+KZ,KAZ,KZ,Kazakhstan,KZ,Asia,48.019573,66.923684
+KG,KGZ,KG,Kyrgyzstan,KG,Asia,41.20438,74.766098
+LA,LAO,LA,Laos,LA,Asia,19.85627,102.495496
+MO,MAC,MC,Macao,MO,Asia,22.198745,113.543873
+MY,MYS,MY,Malaysia,MY,Asia,4.210484,101.975766
+MV,MDV,MV,Maldives,MV,Asia,3.202778,73.22068
+MN,MNG,MG,Mongolia,MN,Asia,46.862496,103.846656
+MM,MMR,BM,Myanmar,MM,Asia,21.913965,95.956223
+NP,NPL,NP,Nepal,NP,Asia,28.394857,84.124008
+KP,PRK,KN,North Korea,KP,Asia,40.339852,127.510093
+PK,PAK,PK,Pakistan,PK,Asia,30.375321,69.345116
+XP,XPR,PF,Paracel Islands,CN,Asia,,
+PH,PHL,RP,Philippines,PH,Asia,12.879721,121.774017
+SG,SGP,SN,Singapore,SG,Asia,1.352083,103.819836
+KR,KOR,KS,South Korea,KR,Asia,35.907757,127.766922
+XS,XSP,PG,Spratly Islands,CN,Asia,,
+LK,LKA,CE,Sri Lanka,LK,Asia,7.873054,80.771797
+TW,TWN,TW,Taiwan,TW,Asia,23.69781,120.960515
+TJ,TJK,TI,Tajikistan,TJ,Asia,38.861034,71.276093
+TH,THA,TH,Thailand,TH,Asia,15.870032,100.992541
+TL,TLS,TT,Timor-Leste,TL,Asia,-8.874217,125.727539
+TM,TKM,TX,Turkmenistan,TM,Asia,38.969719,59.556278
+UZ,UZB,UZ,Uzbekistan,UZ,Asia,41.377491,64.585262
+VN,VNM,VM,Vietnam,VN,Asia,14.058324,108.277199
+AI,AIA,AV,Anguilla,AI,Caribbean,18.220554,-63.068615
+AG,ATG,AC,Antigua and Barbuda,AG,Caribbean,17.060816,-61.796428
+AW,ABW,AA,Aruba,AW,Caribbean,12.52111,-69.968338
+BS,BHS,BF,Bahamas,BS,Caribbean,25.03428,-77.39628
+BB,BRB,BB,Barbados,BB,Caribbean,13.193887,-59.543198
+VG,VGB,VI,British Virgin Islands,GB,Caribbean,18.420695,-64.639968
+KY,CYM,CJ,Cayman Islands,KY,Caribbean,19.513469,-80.566956
+CU,CUB,CU,Cuba,CU,Caribbean,21.521757,-77.781167
+CW,CUW,UC,Curacao,CW,Caribbean,12.1696,-68.99
+DM,DMA,DO,Dominica,DM,Caribbean,15.414999,-61.370976
+DO,DOM,DR,Dominican Republic,DO,Caribbean,18.735693,-70.162651
+GD,GRD,GJ,Grenada,GD,Caribbean,12.262776,-61.604171
+GP,GLP,GP,Guadeloupe,GP,Caribbean,16.2272952,-61.5351602
+HT,HTI,HA,Haiti,HT,Caribbean,18.971187,-72.285215
+JM,JAM,JM,Jamaica,JM,Caribbean,18.109581,-77.297508
+MQ,MTQ,MB,Martinique,FR,Caribbean,14.6566599,-61.0629203
+MS,MSR,MH,Montserrat,MS,Caribbean,16.742498,-62.187366
+PR,PRI,RQ,Puerto Rico,PR,Caribbean,18.220833,-66.590149
+BL,BLM,TB,Saint Barts,BL,Caribbean,17.9,-62.8333
+KN,KNA,SC,Saint Kitts and Nevis,KN,Caribbean,17.357822,-62.782998
+LC,LCA,ST,Saint Lucia,LC,Caribbean,13.909444,-60.978893
+MF,MAF,RN,Saint Martin,MF,Caribbean,18.0708,-63.0501
+VC,VCT,VC,Saint Vincent and the Grenadines,VC,Caribbean,12.984305,-61.287228
+SX,SXM,NN,Sint Maarten,SX,Caribbean,18.08186277,-63.04730179
+TT,TTO,TD,Trinidad and Tobago,TT,Caribbean,10.691803,-61.222503
+TC,TCA,TK,Turks and Caicos Islands,TC,Caribbean,21.694025,-71.797928
+VI,VIR,VI,US Virgin Islands,US,Caribbean,18.335765,-64.896335
+BZ,BLZ,BH,Belize,BZ,Central America,17.189877,-88.49765
+CR,CRI,CS,Costa Rica,CR,Central America,9.748917,-83.753428
+SV,SLV,ES,El Salvador,SV,Central America,13.794185,-88.89653
+GT,GTM,GT,Guatemala,GT,Central America,15.783471,-90.230759
+HN,HND,HO,Honduras,HN,Central America,15.199999,-86.241905
+NI,NIC,NU,Nicaragua,NI,Central America,12.865416,-85.207229
+PA,PAN,PM,Panama,PA,Central America,8.537981,-80.782127
+AX,ALA,FI,Aland Islands,AX,Europe,60.1785,19.9156
+AL,ALB,AL,Albania,AL,Europe,41.153332,20.168331
+AD,AND,AN,Andorra,AD,Europe,42.546245,1.601554
+AT,AUT,AU,Austria,AT,Europe,47.516231,14.550072
+BY,BLR,BO,Belarus,BY,Europe,53.709807,27.953389
+BE,BEL,BE,Belgium,BE,Europe,50.503887,4.469936
+BA,BIH,BK,Bosnia and Herzegovina,BA,Europe,43.915886,17.679076
+BG,BGR,BU,Bulgaria,BG,Europe,42.733883,25.48583
+HR,HRV,HR,Croatia,HR,Europe,45.1,15.2
+CZ,CZE,EZ,Czech Republic,CZ,Europe,49.817492,15.472962
+DK,DNK,DA,Denmark,DK,Europe,56.26392,9.501785
+EE,EST,EN,Estonia,EE,Europe,58.595272,25.013607
+FO,FRO,FO,Faroe Islands,FO,Europe,61.892635,-6.911806
+FI,FIN,FI,Finland,FI,Europe,61.92411,25.748151
+FR,FRA,FR,France,FR,Europe,46.227638,2.213749
+DE,DEU,GM,Germany,DE,Europe,51.165691,10.451526
+GI,GIB,GI,Gibraltar,GI,Europe,36.1409568,-5.354056367
+GR,GRC,GR,Greece,GR,Europe,39.074208,21.824312
+GG,GGY,GK,Guernsey,GG,Europe,49.465691,-2.585278
+HU,HUN,HU,Hungary,HU,Europe,47.162494,19.503304
+IS,ISL,IC,Iceland,IS,Europe,64.963051,-19.020835
+IE,IRL,EI,Ireland,IE,Europe,53.41291,-8.24389
+IM,IMN,IM,Isle of Man,IM,Europe,54.236107,-4.548056
+IT,ITA,IT,Italy,IT,Europe,41.87194,12.56738
+JE,JEY,JE,Jersey,JE,Europe,49.214439,-2.13125
+XK,XKS,KV,Kosovo,XK,Europe,42.602636,20.902977
+LV,LVA,LG,Latvia,LV,Europe,56.879635,24.603189
+LI,LIE,LS,Liechtenstein,LI,Europe,47.166,9.555373
+LT,LTU,LH,Lithuania,LT,Europe,55.169438,23.881275
+LU,LUX,LU,Luxembourg,LU,Europe,49.815273,6.129583
+MK,MKD,MK,Macedonia,MK,Europe,41.608635,21.745275
+MT,MLT,MT,Malta,MT,Europe,35.937496,14.375416
+MD,MDA,MD,Moldova,MD,Europe,47.411631,28.369885
+MC,MCO,MN,Monaco,MC,Europe,43.750298,7.412841
+ME,MNE,MJ,Montenegro,ME,Europe,42.708678,19.37439
+NL,NLD,NL,Netherlands,NL,Europe,52.132633,5.291266
+NO,NOR,NO,Norway,NO,Europe,60.472024,8.468946
+PL,POL,PL,Poland,PL,Europe,51.919438,19.145136
+PT,PRT,PO,Portugal,PT,Europe,39.399872,-8.224454
+RO,ROU,RO,Romania,RO,Europe,45.943161,24.96676
+RU,RUS,RS,Russia,RU,Europe,61.52401,105.318756
+SM,SMR,SM,San Marino,SM,Europe,43.94236,12.457777
+RS,SRB,RI,Serbia,RS,Europe,44.016521,21.005859
+SK,SVK,LO,Slovakia,SK,Europe,48.669026,19.699024
+SI,SVN,SI,Slovenia,SI,Europe,46.151241,14.995463
+ES,ESP,SP,Spain,ES,Europe,40.463667,-3.74922
+SE,SWE,SW,Sweden,SE,Europe,60.128161,18.643501
+CH,CHE,SZ,Switzerland,CH,Europe,46.818188,8.227512
+UA,UKR,UP,Ukraine,UA,Europe,48.379433,31.16558
+GB,GBR,UK,United Kingdom,GB,Europe,55.378051,-3.435973
+VA,VAT,VT,Vatican City,VA,Europe,41.902916,12.453389
+QZ,XQZ,AX,Akrotiri,GB,Middle East,34.59066874,32.9873126
+BH,BHR,BA,Bahrain,BH,Middle East,25.930414,50.637772
+CY,CYP,CY,Cyprus,CY,Middle East,35.126413,33.429859
+XD,XXD,DX,Dhekelia,GB,Middle East,34.99504613,33.81523533
+EG,EGY,EG,Egypt,EG,Middle East,26.820553,30.802498
+IR,IRN,IR,Iran,IR,Middle East,32.427908,53.688046
+IQ,IRQ,IZ,Iraq,IQ,Middle East,33.223191,43.679291
+IL,ISR,IS,Israel,IL,Middle East,31.046051,34.851612
+JO,JOR,JO,Jordan,JO,Middle East,30.585164,36.238414
+KW,KWT,KU,Kuwait,KW,Middle East,29.31166,47.481766
+LB,LBN,LE,Lebanon,LB,Middle East,33.854721,35.862285
+,,,North Cyprus,TR,Middle East,35.19882304,33.61410378
+OM,OMN,MU,Oman,OM,Middle East,21.512583,55.923255
+PS,PSE,PT,Palestinian Territory,PS,Middle East,31.952162,35.233154
+QA,QAT,QA,Qatar,QA,Middle East,25.354826,51.183884
+SA,SAU,SA,Saudi Arabia,SA,Middle East,23.885942,45.079162
+SY,SYR,SY,Syria,SY,Middle East,34.802075,38.996815
+TR,TUR,TU,Turkey,TR,Middle East,38.963745,35.243322
+AE,ARE,AE,United Arab Emirates,AE,Middle East,23.424076,53.847818
+YE,YEM,YM,Yemen,YE,Middle East,15.552727,48.516388
+BM,BMU,BD,Bermuda,BM,North America,32.321384,-64.75737
+CA,CAN,CA,Canada,CA,North America,56.130366,-106.346771
+GL,GRL,GL,Greenland,GL,North America,71.706936,-42.604303
+MX,MEX,MX,Mexico,MX,North America,23.634501,-102.552784
+PM,SPM,SB,Saint Pierre and Miquelon,PM,North America,46.941936,-56.27111
+US,USA,US,United States,US,North America,37.09024,-95.712891
+AS,ASM,AQ,American Samoa,AS,Oceania,-14.270972,-170.132217
+AU,AUS,AS,Australia,AU,Oceania,-25.274398,133.775136
+CP,CPT,IP,Clipperton Island,FR,Oceania,10.2916054,-109.212327
+CK,COK,CW,Cook Islands,CK,Oceania,-21.236736,-159.777671
+XC,XCS,CR,Coral Sea Islands,AU,Oceania,,
+FJ,FJI,FJ,Fiji,FJ,Oceania,-16.578193,179.414413
+PF,PYF,FP,French Polynesia,PF,Oceania,-17.679742,-149.406843
+GU,GUM,GQ,Guam,GU,Oceania,13.444304,144.793731
+KI,KIR,KR,Kiribati,KI,Oceania,-3.370417,-168.734039
+MH,MHL,RM,Marshall Islands,MH,Oceania,7.131474,171.184478
+FM,FSM,FM,Micronesia,FM,Oceania,7.425554,150.550812
+NR,NRU,NR,Nauru,NR,Oceania,-0.522778,166.931503
+NC,NCL,NC,New Caledonia,NC,Oceania,-20.904305,165.618042
+NZ,NZL,NZ,New Zealand,NZ,Oceania,-40.900557,174.885971
+NU,NIU,NE,Niue,NU,Oceania,-19.054445,-169.867233
+NF,NFK,NF,Norfolk Island,NF,Oceania,-29.040835,167.954712
+MP,MNP,CQ,Northern Mariana Islands,MP,Oceania,17.33083,145.38469
+PW,PLW,PS,Palau,PW,Oceania,7.51498,134.58252
+PG,PNG,PP,Papua New Guinea,PG,Oceania,-6.314993,143.95555
+PN,PCN,PC,Pitcairn,PN,Oceania,-24.703615,-127.439308
+WS,WSM,WS,Samoa,WS,Oceania,-13.759029,-172.104629
+SB,SLB,BP,Solomon Islands,SB,Oceania,-9.64571,160.156194
+TK,TKL,TL,Tokelau,NZ,Oceania,-9.199675,-171.8493861
+TO,TON,TN,Tonga,TO,Oceania,-21.178986,-175.198242
+TV,TUV,TV,Tuvalu,GB,Oceania,-8.5225004,179.1945594
+VU,VUT,NH,Vanuatu,VU,Oceania,-15.376706,166.959158
+WF,WLF,WF,Wallis and Futuna,WF,Oceania,-13.768752,-177.156097
+AR,ARG,AR,Argentina,AR,South America,-38.416097,-63.616672
+BO,BOL,BL,Bolivia,BO,South America,-16.290154,-63.588653
+BR,BRA,BR,Brazil,BR,South America,-14.235004,-51.92528
+CL,CHL,CI,Chile,CL,South America,-35.675147,-71.542969
+CO,COL,CO,Colombia,CO,South America,4.570868,-74.297333
+EC,ECU,EC,Ecuador,EC,South America,-1.831239,-78.183406
+FK,FLK,FK,Falkland Islands,FK,South America,-51.796253,-59.523613
+GF,GUF,FG,French Guiana,FR,South America,3.9796183,-53.3784929
+GY,GUY,GY,Guyana,GY,South America,4.860416,-58.93018
+PY,PRY,PA,Paraguay,PY,South America,-23.442503,-58.443832
+PE,PER,PE,Peru,PE,South America,-9.189967,-75.015152
+GS,SGS,SX,South Georgia and South Sandwich Islands,GS,South America,-54.429579,-36.587909
+SR,SUR,NS,Suriname,SR,South America,3.919305,-56.027783
+UY,URY,UY,Uruguay,UY,South America,-32.522779,-55.765835
+VE,VEN,VE,Venezuela,VE,South America,6.42375,-66.58973
+AA,XAA,,Abu Musa and Tunb Islands,IR,Middle East,25.8737192,55.0314345
+Q3,QNM,,No Man's Land,,,,
+Q4,QOS,,Oceans,,,,
+Q5,QUF,,Undersea Features,,,,
+QN,XQN,,Abye,SD,Africa,9.5838619,28.4478713
+QO,XQO,,Aksai Chin,CN,Asia,35.2293676,78.9649399
+QP,XQP,,Brazilian Island,,,,
+QQ,XQQ,,Conejo Island,HN,Central America,13.3477131,-87.7430801
+QR,XQR,,Congo River Islands,,,,
+QT,XQT,,Corisco Bay Islands,,,,
+QV,XQV,,Doumeira Islands,,Africa,12.7167537,43.1461259
+QY,XQY,,Dramana and Shakhatoe,,,,
+SQ,XSQ,,Siachen Glacier,IN,Asia,35.421226,77.10954
+XF,XXF,,Geyser Reef,,,,
+XI,XXI,,Hans Island,,North America,80.8268447,-66.4483562
+XN,XXN,,Heipethes Islands,,,,
+XO,XXO,,Kalapani,IN,Asia,30.2925024,80.7768576
+XX,XXX,,Koalou/Kourou,,Africa,11.0229832,0.9384593
+XY,XXY,,Minerva Reefs,,,,
+XZ,XXZ,,Parsley Island,ES,Africa,35.9139756,-5.4193244
+ZZ,XZZ,,Sapodilla Cayes,,,,
+XW,XWB,PT,West Bank,PS,Middle East,31.9189739,35.2471798
+XG,XGZ,PT,Gaza Strip,PS,Middle East,31.5062235,34.4616653
+BQ,BES,,Caribbean Netherlands,NL,Caribbean,12.2158651,-68.2729263
+XJ,XJM,JN,Jan Mayen,SJ,Europe,71.03415355,-8.2859056
+XR,XSV,SV,Svalbard,SJ,Europe,78.19308295,17.06032752
+SJ,SJM,,Svalbard and Jan Mayen,SJ,Europe,,
+UM,UMI,,United States Minor Outlying Islands,US,Oceania,,
