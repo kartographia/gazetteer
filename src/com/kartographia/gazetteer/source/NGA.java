@@ -1,6 +1,7 @@
 package com.kartographia.gazetteer.source;
 import com.kartographia.gazetteer.utils.*;
 import com.kartographia.gazetteer.*;
+import com.kartographia.gazetteer.data.Countries;
 
 //javaxt includes
 import javaxt.json.*;
@@ -66,15 +67,13 @@ public class NGA {
   //** load
   //**************************************************************************
   /** Used to parse and load data into a database.
-   *
-   * @param file The "Entire country files dataset" from the following URL:
-   *  http://geonames.nga.mil/gns/html/namefiles.html
-   *
-   *  Example:
-   *  http://geonames.nga.mil/gns/html/cntyfile/geonames_20161107.zip
-   *
+   *  @param file File downloaded from the NGA Geonames site. See the download
+   *  method for more information.
+   *  @param countries Instance of the Countries class
    */
-    public static void load(File file, int numThreads, Database database) throws Exception {
+    public static void load(File file, Countries countries, int numThreads,
+        Database database) throws Exception {
+
         init();
 
 
@@ -103,7 +102,7 @@ public class NGA {
                 try{
 
                     Columns columns = getColumns(row, header);
-                    for (javaxt.utils.Record record : getRecords(columns, localeMap)){
+                    for (javaxt.utils.Record record : getRecords(columns, countries, localeMap)){
                         Place place = (Place) record.get("place").toObject();
                         ArrayList<Name> names = (ArrayList<Name>) record.get("names").toObject();
 
@@ -222,12 +221,9 @@ public class NGA {
    *  contain a place and at least one name associated with the place.
    */
     private static ArrayList<javaxt.utils.Record> getRecords(Columns columns,
-        Map<String, Locale> localeMap) {
+        Countries countries, Map<String, Locale> localeMap) {
 
         ArrayList<javaxt.utils.Record> records = new ArrayList<>();
-
-
-        //https://geonames.nga.mil/gns/html/gis_countryfiles.html
 
 
       //Check whether to insert or skip the record
@@ -251,19 +247,33 @@ public class NGA {
         if (latitude==null) latitude = columns.get("lat_dd").toDouble();
         Double longitude = columns.get("long").toDouble();
         if (longitude==null) longitude = columns.get("long_dd").toDouble();
+
+
         String countryCodes = columns.get("cc1").toString();
-        String a1 = columns.get("adm1").toString();
+        HashSet<String> isoCodes = new HashSet<>();
         if (countryCodes==null){
-            if (a1!=null && a1.contains("-")){
-                String[] arr = a1.split("-");
-                countryCodes = arr[0];
-                a1 = arr[1];
-                if (a1.length()>2) a1 = null;
-            }
-            else{
-                countryCodes = columns.get("cc_ft").toString();
+            countryCodes = columns.get("cc_ft").toString();
+            if (countryCodes!=null){
+                for (String iso3 : countryCodes.split(",")){
+                    isoCodes.add(countries.getISO2(iso3));
+                }
             }
         }
+        else{
+            for (String fips : countryCodes.split(",")){
+                isoCodes.add(countries.getISOCode(fips));
+            }
+        }
+
+
+        String a1 = columns.get("adm1").toString();
+        if (a1!=null && a1.contains("-")){
+            String[] arr = a1.split("-");
+            String iso2 = arr[0];
+            if (iso2!=null) isoCodes.add(iso2);
+            a1 = arr[1];
+        }
+
 
         Integer pop = columns.get("pop").toInteger();
         String nt = columns.get("nt").toString();
@@ -367,7 +377,7 @@ public class NGA {
 
 
       //Create records
-        for (String cc : countryCodes.split(",")){
+        for (String cc : isoCodes){
 
 
           //Save place
@@ -789,7 +799,7 @@ public class NGA {
   //**************************************************************************
   /** Used to download country updates from NGA.
    *  @return List of files that were downloaded.
-   *  @deprecated 
+   *  @deprecated
    */
     public static ArrayList<File> downloadUpdates(JSONArray updates, Directory downloadDir){
         ArrayList<File> files = new ArrayList<>();
