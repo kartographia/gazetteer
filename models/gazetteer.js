@@ -30,7 +30,7 @@ var models = {
     Place: {
         fields: [
             {name: 'countryCode',   type: 'char'},
-            {name: 'admin1',        type: 'char'},
+            {name: 'admin1',        type: 'string'},
             {name: 'admin2',        type: 'string'},
             {name: 'geom',          type: 'geo'},
             {name: 'type',          type: 'string'}, //residential, cultural, administrative, industrial, military, etc
@@ -44,7 +44,7 @@ var models = {
         ],
         constraints: [
             {name: 'countryCode',   required: true,  length: 2},
-            {name: 'admin1',        length: 2},
+            {name: 'admin1',        length: 3},
             {name: 'geom',          required: true},
             {name: 'source',        required: true,  onDelete: 'cascade'}
         ]
