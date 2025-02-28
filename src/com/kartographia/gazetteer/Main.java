@@ -1,5 +1,6 @@
 package com.kartographia.gazetteer;
 import com.kartographia.gazetteer.source.*;
+import com.kartographia.gazetteer.data.Countries;
 
 import java.util.*;
 
@@ -29,8 +30,8 @@ public class Main {
   //**************************************************************************
   /** Entry point for the application.
    */
-    public static void main(String[] arr) throws Exception {
-        HashMap<String, String> args = console.parseArgs(arr);
+    public static void main(String[] arguments) throws Exception {
+        HashMap<String, String> args = console.parseArgs(arguments);
 
 
       //Get jar file
@@ -56,126 +57,139 @@ public class Main {
 
 
       //Process command line args
-        if (args.containsKey("-import")){
-            Database database = Config.getDatabase();
-
-            Integer numThreads = console.getValue(args, "-threads", "-t").toInteger();
-            if (numThreads==null) numThreads = 12;
-
-
-            File file = new File(args.get("-import"));
-            if (file.exists()){
-
-                if (file.getExtension().equals("shp")){
-                    System.out.println(
-                    "ERROR: Please specify a name of a source (e.g. \"VLIZ\") " +
-                    "using the -import argument and use -path to specify a path " +
-                    "to the shapefile");
-                }
-                else if (file.getExtension().equals("dictionary")){
-                    updateCountryNames(file);
-                }
-                else{
-                    java.io.BufferedReader br = null;
-                    try{
-                        long startTime = System.currentTimeMillis();
-
-                        br = file.getBufferedReader("UTF-8");
-                        String header = br.readLine();
-                        if (header.startsWith(UTF8_BOM)) {
-                            header = header.substring(1);
-                        }
-                        br.close();
-
-
-                        if (header.startsWith("FEATURE_ID|")){
-                            USGS.load(file, numThreads, database);
-                        }
-                        else if (header.startsWith("RC\t")){
-                            NGA.load(file, numThreads, database);
-                        }
-                        else if (header.startsWith("USPS\t")){
-                            USCensus.load(file, database);
-                        }
-                        else{
-                            throw new Exception("Unknown file type");
-                        }
-
-                        System.out.println();
-                        System.out.println("Ellapsed Time: " + getElapsedTime(startTime));
-                    }
-                    catch(Exception e){
-                        try{ br.close(); } catch(Exception ex){}
-                        e.printStackTrace();
-                    }
-                }
-            }
-            else{
-
-                String source = args.get("-import");
-                if (source==null) throw new Exception("Source is required");
-
-                String path = args.get("-path");
-                file = new File(path);
-                if (file.exists()){
-
-                    if (source.equalsIgnoreCase("NGA")){
-                        NGA.load(file, numThreads, database);
-                    }
-                    else if (source.equalsIgnoreCase("USGS")){
-                        USGS.load(file, numThreads, database);
-                    }
-                    else if (source.equalsIgnoreCase("Census")){
-                        USCensus.load(file, database);
-                    }
-                    else if (source.equalsIgnoreCase("VMAP")){
-                        VMAP.load(file, database);
-                    }
-                    else if (source.equalsIgnoreCase("VLIZ")){
-                        VLIZ.load(file, database);
-                    }
-                    else if (source.equalsIgnoreCase("NaturalEarth")){
-                        NaturalEarth.load(file, database);
-                    }
-                }
-                else{
-                    throw new Exception("Path is required");
-                }
-            }
-
+        if (args.containsKey("-load") || args.containsKey("-import")){
+            loadData(args);
         }
         else if (args.containsKey("-download")){
-
-            Database database = Config.getDatabase();
-
-            String source = args.get("-download");
-            if (source==null) throw new Exception("Source is required");
-
-            Directory downloadDir = new Directory(Config.get("downloads").toString());
-            if (!downloadDir.exists()) downloadDir.create();
-            if (!downloadDir.exists()) throw new Exception("Invalid download directory specified in the config file");
-
-
-            int numThreads = 12;
-            try{numThreads = Integer.parseInt(args.get("-t"));}catch(Exception e){}
-
-
-            if (source.equalsIgnoreCase("NGA")){
-                File file = NGA.download(downloadDir, false);
-                NGA.load(file, numThreads, database);
-            }
-            else if (source.equalsIgnoreCase("USGS")){
-                File file = USGS.download(downloadDir, false);
-                USGS.load(file, numThreads, database);
-            }
-            else if (source.equalsIgnoreCase("NaturalEarth")){
-                File file = NaturalEarth.download(downloadDir, false);
-                NaturalEarth.load(file, database);
-            }
-
+            download(args);
         }
         else if (args.containsKey("-update")){
 
+        }
+    }
+
+
+  //**************************************************************************
+  //** loadData
+  //**************************************************************************
+    private static void loadData(HashMap<String, String> args) throws Exception {
+        File file = new File(args.containsKey("-import") ?
+             args.get("-import") : args.get("-load")
+        );
+        if (!file.exists()){
+            System.out.println("Invalid file");
+            return;
+        }
+
+        Database database = Config.getDatabase();
+
+        Integer numThreads = console.getValue(args, "-threads", "-t").toInteger();
+        if (numThreads==null) numThreads = 12;
+
+
+        String source = args.get("-source");
+        if (source==null){
+
+            if (file.getExtension().equals("shp")){
+                System.out.println(
+                "ERROR: Please specify a name of a source (e.g. \"VLIZ\") " +
+                "using the -import argument and use -path to specify a path " +
+                "to the shapefile");
+            }
+            else if (file.getExtension().equals("dictionary")){
+                updateCountryNames(file);
+            }
+            else{
+
+                try (java.io.BufferedReader br = file.getBufferedReader("UTF-8")){
+                    long startTime = System.currentTimeMillis();
+
+                    String header = br.readLine().toUpperCase();
+                    if (header.startsWith(UTF8_BOM)) {
+                        header = header.substring(1);
+                    }
+                    br.close();
+
+
+                    if (header.startsWith("FEATURE_ID|")){
+                        USGS.load(file, numThreads, database);
+                    }
+                    else if (header.startsWith("RC\t")){
+                        File countryFile = new File(args.get("-countries"));
+                        Countries countries = new Countries(countryFile);
+                        NGA.load(file, countries, numThreads, database);
+                    }
+                    else if (header.startsWith("USPS\t")){
+                        USCensus.load(file, database);
+                    }
+                    else{
+                        throw new Exception("Unknown file type");
+                    }
+
+                    System.out.println();
+                    System.out.println("Ellapsed Time: " + getElapsedTime(startTime));
+                }
+            }
+
+        }
+        else{
+            if (source.equalsIgnoreCase("NGA")){
+                File countryFile = new File(args.get("-countries"));
+                Countries countries = new Countries(countryFile);
+                NGA.load(file, countries, numThreads, database);
+            }
+            else if (source.equalsIgnoreCase("USGS")){
+                USGS.load(file, numThreads, database);
+            }
+            else if (source.equalsIgnoreCase("Census")){
+                USCensus.load(file, database);
+            }
+            else if (source.equalsIgnoreCase("VMAP")){
+                VMAP.load(file, database);
+            }
+            else if (source.equalsIgnoreCase("VLIZ")){
+                VLIZ.load(file, database);
+            }
+            else if (source.equalsIgnoreCase("NaturalEarth")){
+                NaturalEarth.load(file, database);
+            }
+        }
+    }
+
+
+  //**************************************************************************
+  //** download
+  //**************************************************************************
+  /** Used to download and load data
+   */
+    private static void download(HashMap<String, String> args) throws Exception {
+        Database database = Config.getDatabase();
+
+        String source = args.get("-download");
+        if (source==null) throw new Exception("Source is required");
+
+        Directory downloadDir = new Directory(Config.get("downloads").toString());
+        if (!downloadDir.exists()) downloadDir.create();
+        if (!downloadDir.exists()) throw new Exception("Invalid download directory specified in the config file");
+
+
+        int numThreads = 12;
+        try{numThreads = Integer.parseInt(args.get("-t"));}catch(Exception e){}
+
+
+        if (source.equalsIgnoreCase("NGA")){
+            File file = NGA.download(downloadDir, false);
+            File countryFile = new File(args.get("-countries"));
+            Countries countries = new Countries(countryFile);
+            NGA.load(file, countries, numThreads, database);
+        }
+        else if (source.equalsIgnoreCase("USGS")){
+            File file = USGS.download(downloadDir, false);
+            USGS.load(file, numThreads, database);
+        }
+        else if (source.equalsIgnoreCase("NaturalEarth")){
+            File file = NaturalEarth.download(downloadDir, false);
+            NaturalEarth.load(file, database);
         }
     }
 
