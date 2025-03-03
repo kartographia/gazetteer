@@ -1,6 +1,7 @@
 package com.kartographia.gazetteer;
 import com.kartographia.gazetteer.source.*;
 import com.kartographia.gazetteer.data.Countries;
+import com.kartographia.gazetteer.data.CountryNames;
 
 import java.util.*;
 
@@ -15,8 +16,8 @@ import static javaxt.express.utils.StringUtils.*;
 //**  Main
 //******************************************************************************
 /**
- *   Command line interface used to start the web server or to run specialized
- *   functions (e.g. ingest, maintenance scripts, tests, etc).
+ *   Command line interface used to run specialized functions (e.g. download,
+ *   ingest, maintenance scripts, tests, etc).
  *
  ******************************************************************************/
 
@@ -44,8 +45,16 @@ public class Main {
             ConfigFile.getFile(args.get("-config"), jarFile) :
             new File(jar.getFile().getParentFile(), "config.json");
 
+        if (!configFile.exists()){
+            javaxt.io.Directory dir = jarFile.getDirectory();
+            if (dir.getName().equals("dist") || dir.getName().equals("target")) {
+                configFile = new javaxt.io.File(dir.getParentDirectory(), "config.json");
+            }
+        }
+
         if (!configFile.exists()) {
-            System.out.println("Could not find config file. Use the \"-config\" parameter to specify a path to a config");
+            System.out.println("Could not find config file. " +
+            "Use the \"-config\" parameter to specify a path to a config");
             return;
         }
 
@@ -115,8 +124,7 @@ public class Main {
                         USGS.load(file, numThreads, database);
                     }
                     else if (header.startsWith("RC\t")){
-                        File countryFile = new File(args.get("-countries"));
-                        Countries countries = new Countries(countryFile);
+                        Countries countries = new Countries(Config.getData("countries/countries.csv"));
                         NGA.load(file, countries, numThreads, database);
                     }
                     else if (header.startsWith("USPS\t")){
@@ -134,8 +142,7 @@ public class Main {
         }
         else{
             if (source.equalsIgnoreCase("NGA")){
-                File countryFile = new File(args.get("-countries"));
-                Countries countries = new Countries(countryFile);
+                Countries countries = new Countries(Config.getData("countries/countries.csv"));
                 NGA.load(file, countries, numThreads, database);
             }
             else if (source.equalsIgnoreCase("USGS")){
@@ -151,7 +158,9 @@ public class Main {
                 VLIZ.load(file, database);
             }
             else if (source.equalsIgnoreCase("NaturalEarth")){
-                NaturalEarth.load(file, database);
+                Countries countries = new Countries(Config.getData("countries/countries.csv"));
+                CountryNames countryNames = new CountryNames(Config.getData("countries/countries.txt"));
+                NaturalEarth.load(file, countries, countryNames, database);
             }
         }
     }
@@ -189,7 +198,9 @@ public class Main {
         }
         else if (source.equalsIgnoreCase("NaturalEarth")){
             File file = NaturalEarth.download(downloadDir, false);
-            NaturalEarth.load(file, database);
+            Countries countries = new Countries(Config.getData("countries/countries.csv"));
+            CountryNames countryNames = new CountryNames(Config.getData("countries/countries.txt"));
+            NaturalEarth.load(file, countries, countryNames, database);
         }
     }
 
