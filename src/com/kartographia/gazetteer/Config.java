@@ -33,9 +33,31 @@ public class Config {
    */
     public static void load(javaxt.io.File configFile) throws Exception {
 
-
       //Parse config file
-        JSONObject json = new JSONObject(configFile.getText());
+        JSONObject json;
+        try {
+            json = new JSONObject(configFile.getText());
+        }
+        catch(Exception e){
+            throw new IllegalArgumentException("Invalid config file");
+        }
+
+      //Load config
+        load(json, configFile);
+    }
+
+
+  //**************************************************************************
+  //** load
+  //**************************************************************************
+  /** Used to load a config file (JSON) and update config settings
+   *  @param json Config information for the app
+   *  @param configFile File used to resolve relative paths found in the json
+   */
+    public static void load(JSONObject json, javaxt.io.File configFile) throws Exception {
+
+      //Update relative paths in the config
+        updateDir("data", json, configFile, false);
 
 
       //Get database config
@@ -149,6 +171,17 @@ public class Config {
         }
 
         return database;
+    }
+
+
+  //**************************************************************************
+  //** getData
+  //**************************************************************************
+  /** Returns a file in the data directory
+   *  @param relPath Relative path to a file
+   */
+    public static javaxt.io.File getData(String relPath){
+        return new javaxt.io.File(Config.get("data")+relPath);
     }
 
 
