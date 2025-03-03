@@ -1,6 +1,9 @@
 package com.kartographia.gazetteer.source;
-import com.kartographia.gazetteer.utils.Counter;
+
 import com.kartographia.gazetteer.*;
+import com.kartographia.gazetteer.data.*;
+import com.kartographia.gazetteer.utils.Counter;
+
 
 import java.util.*;
 import java.util.zip.ZipEntry;
@@ -53,7 +56,7 @@ public class NaturalEarth {
   //**************************************************************************
   //** load
   //**************************************************************************
-    public static void load(File file, Database database) throws Exception {
+    public static void load(File file, Countries countries, CountryNames countryNames, Database database) throws Exception {
         init();
 
         if (file.getExtension().equals("zip")){
@@ -79,7 +82,7 @@ public class NaturalEarth {
                     if (fieldName.endsWith("*")) fieldName = fieldName.substring(0, fieldName.length()-1);
                     colNames.add(fieldName);
                 }
-                if (!colNames.contains("name") || !colNames.contains("fips_10_") || !colNames.contains("geom") ){
+                if (!colNames.contains("name") || !colNames.contains("iso_a2") || !colNames.contains("geom") ){
                     throw new Exception();
                 }
                 isValidated = true;
@@ -89,8 +92,23 @@ public class NaturalEarth {
             String name = record.getValue("name").toString();
             String formalName = record.getValue("formal_en").toString();
             if (formalName.equals(name)) formalName = null;
-            String cc = record.getValue("fips_10_").toString();
-            if (cc.equals("-99")) cc = "XX";
+            String cc = record.getValue("iso_a2").toString();
+            if (cc==null || cc.length()>2) cc = "-99";
+            if (cc.equals("-99")) cc = record.getValue("iso_a2_eh").toString();
+            if (cc.equals("-99")){
+                
+              //Fuzzy match country name to country code
+                Map<String, Integer> countryCodes = new HashMap<>();
+                countryNames.extractCountries(name, countryCodes);
+                if (!countryCodes.isEmpty()){
+                    String fips = countryCodes.keySet().iterator().next();
+                    cc = countries.getISOCode(fips);
+                }
+            }
+            if (cc.equals("-99")){
+                System.out.println("Skipping " + name + "...");
+                continue;
+            }
             Geometry geom = record.getValue("geom").toGeometry();
             String type = "boundary";
             String subtype = "country";
@@ -99,7 +117,7 @@ public class NaturalEarth {
 
             if (place!=null){
                 //TODO: check overlap for XX?
-                System.out.println("Skipping " + cc + "...");
+                //System.out.println("Skipping " + cc + "...");
                 continue;
             }
 
