@@ -9,17 +9,17 @@ import javaxt.sql.*;
 import javaxt.io.*;
 import javaxt.utils.ThreadPool;
 import static javaxt.utils.Console.console;
+import javaxt.express.utils.CSV;
 
 //java includes
+import java.io.*;
 import java.util.*;
 import java.util.zip.*;
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.sql.PreparedStatement;
+import java.math.BigDecimal;
 import java.sql.SQLException;
+import java.sql.PreparedStatement;
 
+//jts
 import org.locationtech.jts.geom.*;
 
 //******************************************************************************
@@ -71,7 +71,7 @@ public class NGA {
    *  method for more information.
    *  @param countries Instance of the Countries class
    */
-    public static void load(File file, Countries countries, int numThreads,
+    public static void load(javaxt.io.File file, Countries countries, int numThreads,
         Database database) throws Exception {
 
         init();
@@ -79,6 +79,9 @@ public class NGA {
 
       //Get record count
         Counter counter = new Counter(getBufferedReader(file), true);
+
+      //Get header
+        CSV.Columns header = getHeader(file);
 
 
       //Generate a list of ISO 639-3 language codes available in the jdk
@@ -91,7 +94,6 @@ public class NGA {
             localeMap.put(languageCode, locale);
         }
 
-        ArrayList<String> header = new ArrayList<>();
 
 
       //Get places and place names from the file
@@ -101,7 +103,10 @@ public class NGA {
 
                 try{
 
-                    Columns columns = getColumns(row, header);
+                    CSV.Columns columns = CSV.getColumns(row, delimiter);
+                    columns.setHeader(header);
+
+
                     for (javaxt.utils.Record record : getRecords(columns, countries, localeMap)){
                         Place place = (Place) record.get("place").toObject();
                         ArrayList<Name> names = (ArrayList<Name>) record.get("names").toObject();
@@ -199,10 +204,9 @@ public class NGA {
 
       //Parse file and add records to the pool
         try (BufferedReader br = getBufferedReader(file)){
-            String[] cols = br.readLine().split(delimiter, -1);
-            for (String col : cols) header.add(col.trim().toLowerCase());
+            br.readLine();
             String row;
-            while ((row = br.readLine()) != null){
+            while (!(row=CSV.readLine(br)).isEmpty()){
                 pool.add(row);
             }
         }
@@ -220,7 +224,7 @@ public class NGA {
   /** Used to parse a row and return places and names. Each record will
    *  contain a place and at least one name associated with the place.
    */
-    private static ArrayList<javaxt.utils.Record> getRecords(Columns columns,
+    private static ArrayList<javaxt.utils.Record> getRecords(CSV.Columns columns,
         Countries countries, Map<String, Locale> localeMap) {
 
         ArrayList<javaxt.utils.Record> records = new ArrayList<>();
@@ -541,7 +545,7 @@ public class NGA {
   /** Used to download the "Entire country files dataset" from the NGA website:
    *  https://geonames.nga.mil/geonames/GNSData/
    */
-    public static File download(Directory downloadDir, boolean unzip) throws Exception {
+    public static javaxt.io.File download(Directory downloadDir, boolean unzip) throws Exception {
 
         /*
         java.net.URL url = new java.net.URL("https://geonames.nga.mil/gns/html/namefiles.html");
@@ -606,7 +610,7 @@ public class NGA {
 
 
       //Download file
-        File file = new File(downloadDir + "nga/" + fileName + "." + fileExt);
+        javaxt.io.File file = new javaxt.io.File(downloadDir + "nga/" + fileName + "." + fileExt);
         if (!file.exists()){
             response = new javaxt.http.Request(link).getResponse();
             if (response.getStatus()!=200) throw new Exception("Failed to download " + link);
@@ -621,12 +625,11 @@ public class NGA {
 
       //Unzip as needed
         if (unzip){
-            File countryFile = new File(file.getDirectory(), file.getName(false) + ".txt");
+            javaxt.io.File countryFile = new javaxt.io.File(file.getDirectory(), file.getName(false) + ".txt");
             try (ZipInputStream zip = new ZipInputStream(file.getInputStream())){
                 ZipEntry entry;
                 while((entry = zip.getNextEntry())!=null){
-                    fileName = entry.getName();
-                    if (fileName.equalsIgnoreCase("Countries.txt")){
+                    if (hasData(entry)){
                         byte[] buffer = new byte[2048];
                         try (java.io.FileOutputStream output = countryFile.getOutputStream()){
                             int len;
@@ -648,7 +651,7 @@ public class NGA {
   //**************************************************************************
   //** getBufferedReader
   //**************************************************************************
-    private static BufferedReader getBufferedReader(File file) throws Exception {
+    private static BufferedReader getBufferedReader(javaxt.io.File file) throws Exception {
         if (file.getExtension().equals("zip")){
             ZipFile zipFile = new ZipFile(file.toFile());
 
@@ -656,14 +659,9 @@ public class NGA {
             ZipInputStream zip = new ZipInputStream(bis);
             ZipEntry zipEntry;
             while ((zipEntry = zip.getNextEntry()) != null) {
-                if (!zipEntry.isDirectory()) {
-                    final String fileName = zipEntry.getName();
-                    if (fileName.equalsIgnoreCase("Countries.txt")||
-                        fileName.equalsIgnoreCase("Whole_World.txt")||
-                        fileName.equalsIgnoreCase("Populated_Places.txt")){
-                        InputStream is = zipFile.getInputStream(zipEntry);
-                        return new BufferedReader(new InputStreamReader(is, "UTF-8"));
-                    }
+                if (hasData(zipEntry)){
+                    InputStream is = zipFile.getInputStream(zipEntry);
+                    return new BufferedReader(new InputStreamReader(is, "UTF-8"));
                 }
             }
         }
@@ -675,30 +673,30 @@ public class NGA {
 
 
   //**************************************************************************
-  //** getColumns
+  //** hasData
   //**************************************************************************
-    private static Columns getColumns(String row, ArrayList<String> header){
-        HashMap<String, javaxt.utils.Value> columns = new HashMap<>();
-        String[] cols = row.split(delimiter, -1);
-        for (int i=0; i<cols.length; i++){
-            String col = cols[i].trim();
-            if (col.length()==0) col = null;
-            columns.put(header.get(i), new javaxt.utils.Value(col));
+    private static boolean hasData(ZipEntry zipEntry){
+        if (!zipEntry.isDirectory()) {
+            final String fileName = zipEntry.getName();
+            if (fileName.equalsIgnoreCase("Countries.txt")||
+                fileName.equalsIgnoreCase("Whole_World.txt")||
+                fileName.equalsIgnoreCase("Populated_Places.txt")){
+                return true;
+            }
         }
-        return new Columns(columns);
+        return false;
     }
 
-    private static class Columns{
-        private HashMap<String, javaxt.utils.Value> columns;
-        public Columns(HashMap<String, javaxt.utils.Value> columns){
-            this.columns = columns;
-        }
-        public javaxt.utils.Value get(String key){
-            javaxt.utils.Value v = columns.get(key);
-            if (v==null) v = new javaxt.utils.Value(null);
-            return v;
+
+  //**************************************************************************
+  //** getHeader
+  //**************************************************************************
+    private static CSV.Columns getHeader(javaxt.io.File file) throws Exception {
+        try(java.io.BufferedReader br = getBufferedReader(file)){
+            return CSV.parseHeader(br, delimiter);
         }
     }
+
 
   //**************************************************************************
   //** savePlace
@@ -801,15 +799,15 @@ public class NGA {
    *  @return List of files that were downloaded.
    *  @deprecated
    */
-    public static ArrayList<File> downloadUpdates(JSONArray updates, Directory downloadDir){
-        ArrayList<File> files = new ArrayList<>();
+    public static ArrayList<javaxt.io.File> downloadUpdates(JSONArray updates, Directory downloadDir){
+        ArrayList<javaxt.io.File> files = new ArrayList<>();
         for (int i=0; i<updates.length(); i++){
             JSONObject json = updates.get(i).toJSONObject();
             String cc = json.get("cc").toString();
             Integer date = json.get("date").toInteger();
             String link = json.get("link").toString();
 
-            File file = new File(downloadDir, cc + "_" + date +".txt");
+            javaxt.io.File file = new javaxt.io.File(downloadDir, cc + "_" + date +".txt");
             if (!file.exists()){
                 javaxt.http.Response response = new javaxt.http.Request(link).getResponse();
 
