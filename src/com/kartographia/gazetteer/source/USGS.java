@@ -1,6 +1,8 @@
 package com.kartographia.gazetteer.source;
-import com.kartographia.gazetteer.utils.Counter;
+
 import com.kartographia.gazetteer.*;
+import com.kartographia.gazetteer.utils.*;
+import com.kartographia.gazetteer.utils.Counter;
 
 //javaxt includes
 import javaxt.json.*;
@@ -8,16 +10,16 @@ import javaxt.sql.*;
 import javaxt.io.*;
 import javaxt.utils.ThreadPool;
 import static javaxt.utils.Console.console;
+import javaxt.express.utils.CSV;
 
 //java includes
+import java.io.*;
 import java.util.*;
 import java.util.zip.*;
 import java.math.BigDecimal;
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.sql.SQLException;
 import java.sql.PreparedStatement;
+
 
 import org.locationtech.jts.geom.*;
 
@@ -36,7 +38,7 @@ import org.locationtech.jts.geom.*;
 public class USGS {
 
     private static Source source;
-    private static String delimiter = "\\|";
+    private static String delimiter = "|";
     private static int washingtonDC = 531871;
     private static int[] stateCapitals = new int[]{
         1024242,1035849,1080996,1102140,1167861,1213649,1219851,1245051,1266887,
@@ -77,40 +79,48 @@ public class USGS {
    *  @param file "Populated Places" found under "Topical Gazetteers". Example:
    *  http://geonames.usgs.gov/docs/stategaz/POP_PLACES_20161001.zip
    */
-    public static void load(File file, int numThreads, Database database) throws Exception {
+    public static void load(javaxt.io.File file, int numThreads, Database database) throws Exception {
         init();
 
 
       //Get record count
         Counter counter = new Counter(getBufferedReader(file), true);
 
+      //Get header
+        CSV.Columns header = getHeader(file);
 
 
       //Create threads to process records in the file
-        ThreadPool pool = new ThreadPool(numThreads){ //no limit?
+        ThreadPool pool = new ThreadPool(numThreads, 1000){
             public void process(Object obj){
                 String row = (String) obj;
                 counter.updateCount();
 
 
+              //Parse row
+                CSV.Columns columns = CSV.getColumns(row, delimiter);
+                columns.setHeader(header);
+
+
               //Parse columns
-                String[] col = row.split(delimiter, -1);
-                long id = Long.parseLong(col[0]);
-                String name = col[1];
-                String subType = col[2];
+                long id = columns.get("feature_id").toLong();
+                String name = columns.get("feature_name").toString();
+                String subType = columns.get("feature_class").toString();
                 String type = typeMap.get(subType);
                 if (type==null) return;
+                if (type.equalsIgnoreCase(subType)) subType = null;
+                else subType = subType.toLowerCase();
                 String cc = "US";
-                String a1 = col[3];
-                String a2 = col[5];
-                BigDecimal lat = new BigDecimal(col[9]);
-                BigDecimal lon = new BigDecimal(col[10]);
-                Integer lastUpdate = getDate(col[19]); //Date edited (e.g. 05/13/2010)
-                if (lastUpdate==null) lastUpdate = getDate(col[18]); //Date created (e.g. 03/31/1981)
+                String a1 = columns.get("state_alpha").toString();
+                if (a1==null) a1 = stateCodes.get(columns.get("state_numeric").toString());
+                String a2 = columns.get("county_name").toString();
+                BigDecimal lat = columns.get("prim_lat_dec").toBigDecimal();
+                BigDecimal lon = columns.get("prim_long_dec").toBigDecimal();
+                Integer lastUpdate = getDate(columns.get("date_edited").toString()); //Date edited (e.g. 05/13/2010)
+                if (lastUpdate==null) lastUpdate = getDate(columns.get("date_created").toString()); //Date created (e.g. 03/31/1981)
 
-                JSONObject info = new JSONObject();
-                info.set("latitude", lat);
-                info.set("longitude", lon);
+                JSONObject info = null;
+
                 Geometry geom = geometryFactory.createPoint(
                     new Coordinate(lon.doubleValue(), lat.doubleValue())
                 );
@@ -120,6 +130,7 @@ public class USGS {
 
                 if (name.endsWith("(historical)")){
                     name = name.substring(0, name.length()-"(historical)".length()).trim();
+                    if (info==null) info = new JSONObject();
                     info.set("note", "historical");
                 }
 
@@ -168,8 +179,7 @@ public class USGS {
 
 
               //Save name
-                try{
-                    Recordset rs = getRecordset(place, uname);
+                try (Recordset rs = getRecordset(place, uname)) {
                     if (rs.EOF) rs.addNew();
                     rs.setValue("name", name);
                     rs.setValue("uname", uname);
@@ -180,7 +190,6 @@ public class USGS {
                     rs.setValue("source_key", id);
                     rs.setValue("source_date", lastUpdate);
                     rs.update();
-                    rs.close();
                 }
                 catch(Exception e){
                     console.log(e.getMessage());
@@ -197,12 +206,12 @@ public class USGS {
                     placeQuery.setLong(1, source.getID());
                     placeQuery.setLong(2, place.getSourceKey());
                     placeQuery.setString(3, place.getCountryCode());
-                    java.sql.ResultSet r2 = placeQuery.executeQuery();
-                    while (r2.next()) {
-                        placeID = r2.getLong(1);
-                        currDate = r2.getInt(2);
+                    try (java.sql.ResultSet r2 = placeQuery.executeQuery()){
+                        while (r2.next()) {
+                            placeID = r2.getLong(1);
+                            currDate = r2.getInt(2);
+                        }
                     }
-                    r2.close();
 
                     place.setID(placeID);
 
@@ -285,14 +294,14 @@ public class USGS {
 
 
 
-      //Parse file
-        java.io.BufferedReader br = file.getBufferedReader("UTF-8");
-        br.readLine(); //Skip header
-        String row;
-        while ((row = br.readLine()) != null){
-            pool.add(row);
+      //Parse file and add records to the pool
+        try(java.io.BufferedReader br = getBufferedReader(file)){
+            br.readLine();
+            String row;
+            while (!(row=CSV.readLine(br)).isEmpty()){
+                pool.add(row);
+            }
         }
-        br.close();
 
 
         pool.done();
@@ -307,14 +316,14 @@ public class USGS {
   //**************************************************************************
   /** Used to download the "National File" from the USGS website
    */
-    public static File download(Directory downloadDir, boolean unzip) throws Exception {
+    public static javaxt.io.File download(Directory downloadDir, boolean unzip) throws Exception {
         java.net.URL url = new java.net.URL(
         "https://www.usgs.gov/us-board-on-geographic-names/download-gnis-data");
         javaxt.http.Response response = new javaxt.http.Request(url).getResponse();
         if (response.getStatus()!=200) throw new Exception("Failed to connect to " + url);
         String html = response.getText();
 
-        File file = null;
+        javaxt.io.File file = null;
         for (javaxt.html.Element el : new javaxt.html.Parser(html).getElementsByTagName("a")){
             String text = el.getInnerText();
             if (text.equals("All Names")){
@@ -323,7 +332,7 @@ public class USGS {
                 String path = new javaxt.utils.URL(link).getPath();
                 if (path.endsWith("/")) path = path.substring(0, path.length()-1);
                 String fileName = path.substring(path.lastIndexOf("/")+1);
-                file = new File(downloadDir + "usgs/" + fileName);
+                file = new javaxt.io.File(downloadDir + "usgs/" + fileName);
                 if (!file.exists()){
                     response = new javaxt.http.Request(link).getResponse();
                     if (response.getStatus()!=200) throw new Exception("Failed to download " + link);
@@ -342,12 +351,11 @@ public class USGS {
         if (file==null) throw new Exception("Failed to find file to download");
 
         if (unzip){
-            File countryFile = new File(file.getDirectory(), file.getName(false) + ".txt");
+            javaxt.io.File countryFile = new javaxt.io.File(file.getDirectory(), file.getName(false) + ".txt");
             ZipInputStream zip = new ZipInputStream(file.getInputStream());
             ZipEntry entry;
             while((entry = zip.getNextEntry())!=null){
-                String fileName = entry.getName();
-                if (fileName.startsWith("NationalFile_")){
+                if (hasData(entry)){
                     byte[] buffer = new byte[2048];
                     java.io.FileOutputStream output = countryFile.getOutputStream();
                     int len;
@@ -369,7 +377,7 @@ public class USGS {
   //**************************************************************************
   //** getBufferedReader
   //**************************************************************************
-    private static BufferedReader getBufferedReader(File file) throws Exception {
+    private static BufferedReader getBufferedReader(javaxt.io.File file) throws Exception {
         if (file.getExtension().equals("zip")){
             ZipFile zipFile = new ZipFile(file.toFile());
 
@@ -377,12 +385,9 @@ public class USGS {
             ZipInputStream zip = new ZipInputStream(bis);
             ZipEntry zipEntry;
             while ((zipEntry = zip.getNextEntry()) != null) {
-                if (!zipEntry.isDirectory()) {
-                    final String fileName = zipEntry.getName();
-                    if (fileName.startsWith("NationalFile_")){
-                        InputStream is = zipFile.getInputStream(zipEntry);
-                        return new BufferedReader(new InputStreamReader(is, "UTF-8"));
-                    }
+                if (hasData(zipEntry)){
+                    InputStream is = zipFile.getInputStream(zipEntry);
+                    return new BufferedReader(new InputStreamReader(is, "UTF-8"));
                 }
             }
         }
@@ -390,6 +395,33 @@ public class USGS {
             return file.getBufferedReader("UTF-8");
         }
         return null;
+    }
+
+
+  //**************************************************************************
+  //** hasData
+  //**************************************************************************
+    private static boolean hasData(ZipEntry zipEntry){
+        if (!zipEntry.isDirectory()) {
+            String fileName = zipEntry.getName();
+            int idx = fileName.lastIndexOf("/");
+            if (idx>-1) fileName = fileName.substring(idx+1);
+            if (fileName.startsWith("NationalFile_") ||
+                fileName.startsWith("DomesticNames_National.txt")){
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+  //**************************************************************************
+  //** getHeader
+  //**************************************************************************
+    private static CSV.Columns getHeader(javaxt.io.File file) throws Exception {
+        try(java.io.BufferedReader br = getBufferedReader(file)){
+            return CSV.parseHeader(br, delimiter);
+        }
     }
 
 
@@ -610,4 +642,72 @@ public class USGS {
         typeMap.put("Tunnel", "transportation");
         typeMap.put("Well", "industry");
     }
+
+
+  //**************************************************************************
+  //** stateCodes
+  //**************************************************************************
+  /** Used to map state codes to 2-character abbreviations
+   */
+    private static HashMap<String, String> stateCodes = new HashMap<String, String>();
+    static {
+        stateCodes.put("01", "AL"); //Alabama
+        stateCodes.put("02", "AK"); //Alaska
+        stateCodes.put("04", "AZ"); //Arizona
+        stateCodes.put("05", "AR"); //Arkansas
+        stateCodes.put("06", "CA"); //California
+        stateCodes.put("08", "CO"); //Colorado
+        stateCodes.put("09", "CT"); //Connecticut
+        stateCodes.put("10", "DE"); //Delaware
+        stateCodes.put("11", "DC"); //District of Columbia
+        stateCodes.put("12", "FL"); //Florida
+        stateCodes.put("13", "GA"); //Georgia
+        stateCodes.put("15", "HI"); //Hawaii
+        stateCodes.put("16", "ID"); //Idaho
+        stateCodes.put("17", "IL"); //Illinois
+        stateCodes.put("18", "IN"); //Indiana
+        stateCodes.put("19", "IA"); //Iowa
+        stateCodes.put("20", "KS"); //Kansas
+        stateCodes.put("21", "KY"); //Kentucky
+        stateCodes.put("22", "LA"); //Louisiana
+        stateCodes.put("23", "ME"); //Maine
+        stateCodes.put("24", "MD"); //Maryland
+        stateCodes.put("25", "MA"); //Massachusetts
+        stateCodes.put("26", "MI"); //Michigan
+        stateCodes.put("27", "MN"); //Minnesota
+        stateCodes.put("28", "MS"); //Mississippi
+        stateCodes.put("29", "MO"); //Missouri
+        stateCodes.put("30", "MT"); //Montana
+        stateCodes.put("31", "NE"); //Nebraska
+        stateCodes.put("32", "NV"); //Nevada
+        stateCodes.put("33", "NH"); //New Hampshire
+        stateCodes.put("34", "NJ"); //New Jersey
+        stateCodes.put("35", "NM"); //New Mexico
+        stateCodes.put("36", "NY"); //New York
+        stateCodes.put("37", "NC"); //North Carolina
+        stateCodes.put("38", "ND"); //North Dakota
+        stateCodes.put("39", "OH"); //Ohio
+        stateCodes.put("40", "OK"); //Oklahoma
+        stateCodes.put("41", "OR"); //Oregon
+        stateCodes.put("42", "PA"); //Pennsylvania
+        stateCodes.put("44", "RI"); //Rhode Island
+        stateCodes.put("45", "SC"); //South Carolina
+        stateCodes.put("46", "SD"); //South Dakota
+        stateCodes.put("47", "TN"); //Tennessee
+        stateCodes.put("48", "TX"); //Texas
+        stateCodes.put("49", "UT"); //Utah
+        stateCodes.put("50", "VT"); //Vermont
+        stateCodes.put("51", "VA"); //Virginia
+        stateCodes.put("53", "WA"); //Washington
+        stateCodes.put("54", "WV"); //West Virginia
+        stateCodes.put("55", "WI"); //Wisconsin
+        stateCodes.put("56", "WY"); //Wyoming
+        stateCodes.put("60", "AS"); //American Samoa
+        stateCodes.put("66", "GU"); //Guam
+        stateCodes.put("69", "MP"); //Commonwealth of the Northern Mariana Islands
+        stateCodes.put("72", "PR"); //Puerto Rico
+        stateCodes.put("74", "UM"); //U.S. Minor Outlying Islands
+        stateCodes.put("78", "VI"); //United States Virgin Islands
+    }
+
 }
