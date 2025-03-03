@@ -4,7 +4,7 @@ import java.util.*;
 import javaxt.express.utils.CSV;
 
 //******************************************************************************
-//**  Countries
+//**  CountryCodes
 //******************************************************************************
 /**
  *   Used to represent a list of countries. Each entry includes a country
@@ -13,7 +13,7 @@ import javaxt.express.utils.CSV;
  *
  ******************************************************************************/
 
-public class Countries {
+public class CountryCodes {
 
     private HashMap<String, javaxt.utils.Record> records;
     private HashMap<String, String> fipsToISO;
@@ -26,7 +26,7 @@ public class Countries {
   /** Used to instantiate this class using a csv file with a list of countries
    *  like one found in the data directory (e.g. "countries.csv")
    */
-    public Countries(javaxt.io.File countries) throws Exception {
+    public CountryCodes(javaxt.io.File countries) throws Exception {
         records = new HashMap<>();
         fipsToISO = new HashMap<>();
         iso3 = new HashMap<>();
@@ -54,6 +54,14 @@ public class Countries {
                 records.put(iso2, record);
             }
         }
+    }
+
+
+  //**************************************************************************
+  //** getRecords
+  //**************************************************************************
+    public ArrayList<javaxt.utils.Record> getRecords(){
+        return new ArrayList<javaxt.utils.Record>(records.values());
     }
 
 

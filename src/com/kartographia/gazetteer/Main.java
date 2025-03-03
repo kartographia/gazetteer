@@ -1,6 +1,6 @@
 package com.kartographia.gazetteer;
 import com.kartographia.gazetteer.source.*;
-import com.kartographia.gazetteer.data.Countries;
+import com.kartographia.gazetteer.data.CountryCodes;
 import com.kartographia.gazetteer.data.CountryNames;
 
 import java.util.*;
@@ -124,8 +124,8 @@ public class Main {
                         USGS.load(file, numThreads, database);
                     }
                     else if (header.startsWith("RC\t")){
-                        Countries countries = new Countries(Config.getData("countries/countries.csv"));
-                        NGA.load(file, countries, numThreads, database);
+                        CountryCodes countryCodes = new CountryCodes(Config.getData("countries/countries.csv"));
+                        NGA.load(file, countryCodes, numThreads, database);
                     }
                     else if (header.startsWith("USPS\t")){
                         USCensus.load(file, database);
@@ -142,7 +142,7 @@ public class Main {
         }
         else{
             if (source.equalsIgnoreCase("NGA")){
-                Countries countries = new Countries(Config.getData("countries/countries.csv"));
+                CountryCodes countries = new CountryCodes(Config.getData("countries/countries.csv"));
                 NGA.load(file, countries, numThreads, database);
             }
             else if (source.equalsIgnoreCase("USGS")){
@@ -158,9 +158,9 @@ public class Main {
                 VLIZ.load(file, database);
             }
             else if (source.equalsIgnoreCase("NaturalEarth")){
-                Countries countries = new Countries(Config.getData("countries/countries.csv"));
+                CountryCodes countryCodes = new CountryCodes(Config.getData("countries/countries.csv"));
                 CountryNames countryNames = new CountryNames(Config.getData("countries/countries.txt"));
-                NaturalEarth.load(file, countries, countryNames, database);
+                NaturalEarth.load(file, countryCodes, countryNames, database);
             }
         }
     }
@@ -188,9 +188,8 @@ public class Main {
 
         if (source.equalsIgnoreCase("NGA")){
             File file = NGA.download(downloadDir, false);
-            File countryFile = new File(args.get("-countries"));
-            Countries countries = new Countries(countryFile);
-            NGA.load(file, countries, numThreads, database);
+            CountryCodes countryCodes = new CountryCodes(Config.getData("countries/countries.csv"));
+            NGA.load(file, countryCodes, numThreads, database);
         }
         else if (source.equalsIgnoreCase("USGS")){
             File file = USGS.download(downloadDir, false);
@@ -198,9 +197,9 @@ public class Main {
         }
         else if (source.equalsIgnoreCase("NaturalEarth")){
             File file = NaturalEarth.download(downloadDir, false);
-            Countries countries = new Countries(Config.getData("countries/countries.csv"));
+            CountryCodes countryCodes = new CountryCodes(Config.getData("countries/countries.csv"));
             CountryNames countryNames = new CountryNames(Config.getData("countries/countries.txt"));
-            NaturalEarth.load(file, countries, countryNames, database);
+            NaturalEarth.load(file, countryCodes, countryNames, database);
         }
     }
 
