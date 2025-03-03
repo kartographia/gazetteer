@@ -1,19 +1,22 @@
-/build/
-/data/
+# Ignore build artifacts
 /dist/
+/build/
+/target/
+
+
+# Ignore IDE stuff
 /lib/
 /nbproject/
 /build.xml
-/*.txt
-[Cc]onfig.json
 manifest.mf
 
 
-node_modules/
-package.json
-package-lock.json
+# Ignore config file
+[Cc]onfig.json
 
 
+# Misc
 *.dll
+/*.txt
 **/test.html*
 **/!README.TXT
