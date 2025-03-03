@@ -69,7 +69,8 @@ public class NGA {
   /** Used to parse and load data into a database.
    *  @param file File downloaded from the NGA Geonames site. See the download
    *  method for more information.
-   *  @param countries Instance of the Countries class
+   *  @param countries Instance of the Countries class. Used to convert ISO3
+   *  to ISO2.
    */
     public static void load(javaxt.io.File file, Countries countries, int numThreads,
         Database database) throws Exception {

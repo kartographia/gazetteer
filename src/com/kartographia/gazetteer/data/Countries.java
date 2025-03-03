@@ -7,7 +7,9 @@ import javaxt.express.utils.CSV;
 //**  Countries
 //******************************************************************************
 /**
- *   Used to represent a list of countries
+ *   Used to represent a list of countries. Each entry includes a country
+ *   name and code (e.g. FIPS, ISO). In addition, records may include a
+ *   region and map coordinates.
  *
  ******************************************************************************/
 

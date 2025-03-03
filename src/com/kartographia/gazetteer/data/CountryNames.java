@@ -73,9 +73,13 @@ public class CountryNames {
   //**************************************************************************
   //** extractCountries
   //**************************************************************************
-  /** Used to parse a given block of text and extract countries.
+  /** Used to parse a given block of text and extract countries. Extracted
+   *  countries are inserted into the countryCodes hashmap. Returns a copy
+   *  of the input text with country names removed.
+   *  @param InputText Test to search
    *  @param countryCodes A hashmap of country codes and counts for each.
-   *  Entries are created or updated as countries are found.
+   *  Entries are created or updated as countries are found. This parameter is
+   *  optional.
    */
     public String extractCountries(String InputText, Map<String, Integer> countryCodes){
 

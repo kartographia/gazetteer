@@ -56,7 +56,18 @@ public class NaturalEarth {
   //**************************************************************************
   //** load
   //**************************************************************************
-    public static void load(File file, Countries countries, CountryNames countryNames, Database database) throws Exception {
+  /** Used to parse and load country boundaries data into a database.
+   *  @param file Shapefile (*.shp)
+   *  @param countries Instance of the Countries class. Used in conjunction
+   *  with CountryNames to find an ISO 2 country code for a country name in
+   *  cases where NaturalEarth doesn't have a ISO 2 code.
+   *  @param countryNames Instance of the CountryNames class. Used in
+   *  conjunction with Countries yo find ISO 2 country codes (see above).
+   *  @param database Database connection info
+   */
+    public static void load(File file, Countries countries, CountryNames countryNames,
+        Database database) throws Exception {
+
         init();
 
         if (file.getExtension().equals("zip")){
@@ -96,7 +107,7 @@ public class NaturalEarth {
             if (cc==null || cc.length()>2) cc = "-99";
             if (cc.equals("-99")) cc = record.getValue("iso_a2_eh").toString();
             if (cc.equals("-99")){
-                
+
               //Fuzzy match country name to country code
                 Map<String, Integer> countryCodes = new HashMap<>();
                 countryNames.extractCountries(name, countryCodes);
