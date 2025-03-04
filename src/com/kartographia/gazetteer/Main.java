@@ -66,14 +66,20 @@ public class Main {
 
 
       //Process command line args
-        if (args.containsKey("-load") || args.containsKey("-import")){
-            loadData(args);
-        }
-        else if (args.containsKey("-download")){
-            download(args);
-        }
-        else if (args.containsKey("-update")){
+        try{
+            if (args.containsKey("-load") || args.containsKey("-import")){
+                loadData(args);
+            }
+            else if (args.containsKey("-download")){
+                download(args);
+            }
+            else if (args.containsKey("-update")){
 
+            }
+        }
+        catch(Exception e){
+            System.out.println(e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -82,13 +88,12 @@ public class Main {
   //** loadData
   //**************************************************************************
     private static void loadData(HashMap<String, String> args) throws Exception {
+        
         File file = new File(args.containsKey("-import") ?
              args.get("-import") : args.get("-load")
         );
-        if (!file.exists()){
-            System.out.println("Invalid file");
-            return;
-        }
+        if (!file.exists()) throw new Exception("Invalid file");
+
 
         Database database = Config.getDatabase();
 
@@ -100,7 +105,7 @@ public class Main {
         if (source==null){
 
             if (file.getExtension().equals("shp")){
-                System.out.println(
+                throw new Exception(
                 "ERROR: Please specify a name of a source (e.g. \"VLIZ\") " +
                 "using the -import argument and use -path to specify a path " +
                 "to the shapefile");
@@ -162,6 +167,14 @@ public class Main {
                 CountryNames countryNames = new CountryNames(Config.getData("countries/countries.txt"));
                 NaturalEarth.load(file, countryCodes, countryNames, database);
             }
+            else if (source.equalsIgnoreCase("Kartographia")){
+                CountryNames countryNames = new CountryNames(file);
+                CountryCodes countryCodes = new CountryCodes(Config.getData("countries/countries.csv"));
+                Kartographia.load(countryNames, countryCodes, database);
+            }
+            else{
+                throw new Exception("Invalid -source argument. Given \"" + source + "\".");
+            }
         }
     }
 
@@ -175,31 +188,41 @@ public class Main {
         Database database = Config.getDatabase();
 
         String source = args.get("-download");
-        if (source==null) throw new Exception("Source is required");
+        if (source==null) throw new Exception("Invalid -source argument. Source is required.");
 
         Directory downloadDir = new Directory(Config.get("downloads").toString());
         if (!downloadDir.exists()) downloadDir.create();
         if (!downloadDir.exists()) throw new Exception("Invalid download directory specified in the config file");
 
 
-        int numThreads = 12;
-        try{numThreads = Integer.parseInt(args.get("-t"));}catch(Exception e){}
+        Integer numThreads = console.getValue(args, "-threads", "-t").toInteger();
+        if (numThreads==null) numThreads = 12;
 
+        boolean loadData = (args.containsKey("-load") || args.containsKey("-import"));
 
         if (source.equalsIgnoreCase("NGA")){
             File file = NGA.download(downloadDir, false);
-            CountryCodes countryCodes = new CountryCodes(Config.getData("countries/countries.csv"));
-            NGA.load(file, countryCodes, numThreads, database);
+            if (loadData){
+                CountryCodes countryCodes = new CountryCodes(Config.getData("countries/countries.csv"));
+                NGA.load(file, countryCodes, numThreads, database);
+            }
         }
         else if (source.equalsIgnoreCase("USGS")){
             File file = USGS.download(downloadDir, false);
-            USGS.load(file, numThreads, database);
+            if (loadData){
+                USGS.load(file, numThreads, database);
+            }
         }
         else if (source.equalsIgnoreCase("NaturalEarth")){
             File file = NaturalEarth.download(downloadDir, false);
-            CountryCodes countryCodes = new CountryCodes(Config.getData("countries/countries.csv"));
-            CountryNames countryNames = new CountryNames(Config.getData("countries/countries.txt"));
-            NaturalEarth.load(file, countryCodes, countryNames, database);
+            if (loadData){
+                CountryCodes countryCodes = new CountryCodes(Config.getData("countries/countries.csv"));
+                CountryNames countryNames = new CountryNames(Config.getData("countries/countries.txt"));
+                NaturalEarth.load(file, countryCodes, countryNames, database);
+            }
+        }
+        else{
+            throw new Exception("Invalid -source argument. Given \"" + source + "\".");
         }
     }
 
